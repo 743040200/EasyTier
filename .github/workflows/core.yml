@@ -50,6 +50,15 @@ jobs:
 
           - TARGET: x86_64-pc-windows-msvc
             OS: windows-latest
+
+          - TARGET: armv7-unknown-linux-musleabihf # raspberry pi 2-3-4, not tested
+            OS: ubuntu-latest
+          - TARGET: armv7-unknown-linux-musleabi # raspberry pi 2-3-4, not tested
+            OS: ubuntu-latest
+          - TARGET: arm-unknown-linux-musleabihf # raspberry pi 0-1, not tested
+            OS: ubuntu-latest
+          - TARGET: arm-unknown-linux-musleabi # raspberry pi 0-1, not tested
+            OS: ubuntu-latest
     runs-on: ${{ matrix.OS }}
     env:
       NAME: easytier
@@ -85,10 +94,17 @@ jobs:
       - name: Build Core & Cli
         run: |
           if [[ $OS =~ ^ubuntu.*$ && $TARGET =~ ^mips.*$ ]]; then
-            cargo +nightly build -r --verbose --target $TARGET -Z build-std --no-default-features --features mips
+            cargo +nightly build -r --verbose --target $TARGET -Z build-std=std,panic_abort --no-default-features --features mips
           else
             cargo build --release --verbose --target $TARGET
           fi
+
+      - name: Install UPX
+        if: ${{ matrix.OS != 'macos-latest' }}
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          install-only: true
 
       - name: Compress
         run: |
@@ -104,6 +120,12 @@ jobs:
           else
             TAG=$GITHUB_SHA
           fi
+
+          if [[ $OS =~ ^windows.*$ ]]; then
+            upx --lzma --best ./target/$TARGET/release/easytier-core"$SUFFIX"
+            upx --lzma --best ./target/$TARGET/release/easytier-cli"$SUFFIX"
+          fi
+
           mv ./target/$TARGET/release/easytier-core"$SUFFIX" ./artifacts/objects/
           mv ./target/$TARGET/release/easytier-cli"$SUFFIX" ./artifacts/objects/
 
