@@ -211,11 +211,11 @@ jobs:
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-cli
       - name: 打包
         run: |
-          cd ./target/${{ env.TARGET }}/release
+          cd /opt/et/target/${{ env.TARGET }}/release
           file easytier-core
           tar -czvf easytier-${{ env.NAME }}.tar.gz easytier-core easytier-cli
-          cp -f /opt/et/easytier-core /opt/bin/easytier-core
-          cp -f /opt/et/easytier-cli /opt/bin/easytier-cli
+          cp -f ./easytier-core /opt/bin/easytier-core
+          cp -f ./easytier-cli /opt/bin/easytier-cli
       - name: 上传
         uses: actions/upload-artifact@v4
         if: always()
