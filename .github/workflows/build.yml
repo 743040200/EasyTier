@@ -207,15 +207,15 @@ jobs:
       - name: 压缩
         if: github.event.inputs.upx == 'true'
         run: |
-          upx --lzma --best ./target/${{ env.TARGET }}/release/easytier-core
-          upx --lzma --best ./target/${{ env.TARGET }}/release/easytier-cli
+          upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-core
+          upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-cli
       - name: 打包
         run: |
           cd ./target/${{ env.TARGET }}/release
           file easytier-core
           tar -czvf easytier-${{ env.NAME }}.tar.gz easytier-core easytier-cli
-          cp -f ./easytier-core /opt/bin/easytier-core
-          cp -f ./easytier-cli /opt/bin/easytier-cli
+          cp -f /opt/et/easytier-core /opt/bin/easytier-core
+          cp -f /opt/et/easytier-cli /opt/bin/easytier-cli
       - name: 上传
         uses: actions/upload-artifact@v4
         if: always()
@@ -237,7 +237,7 @@ jobs:
            [官方更新说明](https://github.com/EasyTier/EasyTier/releases)
            
           tag_name: ${{ needs.check.outputs.ver }}
-          files: ./target/${{ env.TARGET }}/release/easytier-${{ env.NAME }}.tar.gz
+          files: /opt/et/target/${{ env.TARGET }}/release/easytier-${{ env.NAME }}.tar.gz
       - name: 发布预发布版本
         if: github.event.inputs.fb == 'true' && github.event.inputs.rel == 'prerelease'
         uses: softprops/action-gh-release@v2
@@ -254,4 +254,4 @@ jobs:
            
           tag_name: ${{ needs.check.outputs.ver }}-${{ env.tags }}
           prerelease: true
-          files: ./target/${{ env.TARGET }}/release/easytier-${{ env.NAME }}.tar.gz
+          files: /opt/et/target/${{ env.TARGET }}/release/easytier-${{ env.NAME }}.tar.gz
