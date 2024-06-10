@@ -60,7 +60,7 @@ jobs:
         keep_minimum_runs: 1
  build:
     needs: check
-    if: ${{ github.event.inputs.bj != 'false' || (github.event.inputs.bj == 'false' && needs.check.outputs.ver != needs.check.outputs.cver) }}
+    if: ${{ github.event.inputs.bj == 'true' || (github.event.inputs.bj != 'true' && needs.check.outputs.ver != needs.check.outputs.cver) }}
     strategy:
       fail-fast: false
       matrix:
@@ -190,6 +190,8 @@ jobs:
           install-only: true
       - name: 编译
         run: |
+          tagg=${{ env.BRANCHES }}
+          [[ -z $tagg ]] && tagg=main
           git clone -b ${{ env.BRANCHES }} https://github.com/EasyTier/EasyTier /opt/et
           cd /opt/et
           mkdir -p /opt/bin
@@ -205,7 +207,7 @@ jobs:
           echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
           echo "tags=$(date '+%Y%m%d')" >> $GITHUB_ENV
       - name: 压缩
-        if: github.event.inputs.upx == 'true'
+        if: github.event.inputs.upx != 'false'
         run: |
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-core
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-cli
@@ -223,7 +225,7 @@ jobs:
           name: easytier-${{ env.NAME }}
           path: /opt/bin/*
       - name: 发布稳定版
-        if: github.event.inputs.fb == 'true' && github.event.inputs.rel == 'release'
+        if: github.event.inputs.fb != 'false' && github.event.inputs.rel != 'prerelease'
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.c8 }}
