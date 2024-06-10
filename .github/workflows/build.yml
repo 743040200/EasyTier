@@ -200,8 +200,8 @@ jobs:
              cargo build --release --target ${{ env.TARGET }}
           fi
           
-          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip /opt/bin/easytier-core
-          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip /opt/bin/easytier-cli
+          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
+          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-cli
           echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
           echo "tags=$(date '+%Y%m%d')" >> $GITHUB_ENV
       - name: 压缩
