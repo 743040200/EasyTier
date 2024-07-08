@@ -333,7 +333,7 @@ impl PeerManager {
         let foreign_client = self.foreign_network_client.clone();
         let encryptor = self.encryptor.clone();
         self.tasks.lock().await.spawn(async move {
-            log::trace!("start_peer_recv");
+            tracing::trace!("start_peer_recv");
             while let Some(mut ret) = recv.next().await {
                 let Some(hdr) = ret.mut_peer_manager_header() else {
                     tracing::warn!(?ret, "invalid packet, skip");
@@ -417,7 +417,7 @@ impl PeerManager {
                 if hdr.packet_type == PacketType::Data as u8 {
                     tracing::trace!(?packet, "send packet to nic channel");
                     // TODO: use a function to get the body ref directly for zero copy
-                    self.nic_channel.send(packet).await.unwrap();
+                    let _ = self.nic_channel.send(packet).await;
                     None
                 } else {
                     Some(packet)
@@ -535,6 +535,10 @@ impl PeerManager {
         self.get_route().list_routes().await
     }
 
+    pub async fn dump_route(&self) -> String {
+        self.get_route().dump().await
+    }
+
     async fn run_nic_packet_process_pipeline(&self, data: &mut ZCPacket) {
         for pipeline in self.nic_packet_process_pipeline.read().await.iter().rev() {
             pipeline.try_process_packet_from_nic(data).await;
@@ -572,7 +576,7 @@ impl PeerManager {
     }
 
     pub async fn send_msg_ipv4(&self, mut msg: ZCPacket, ipv4_addr: Ipv4Addr) -> Result<(), Error> {
-        log::trace!(
+        tracing::trace!(
             "do send_msg in peer manager, msg: {:?}, ipv4_addr: {}",
             msg,
             ipv4_addr

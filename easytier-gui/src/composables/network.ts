@@ -1,4 +1,5 @@
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from "@tauri-apps/api/core"
+
 import type { NetworkConfig, NetworkInstanceRunningInfo } from '~/types/network'
 
 export async function parseNetworkConfig(cfg: NetworkConfig) {
@@ -23,4 +24,8 @@ export async function getOsHostname() {
 
 export async function setAutoLaunchStatus(enable: boolean) {
   return await invoke<boolean>('set_auto_launch_status', { enable })
+}
+
+export async function setLoggingLevel(level: string) {
+  return await invoke('set_logging_level', { level })
 }

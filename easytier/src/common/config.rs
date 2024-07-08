@@ -150,6 +150,8 @@ pub struct VpnPortalConfig {
 pub struct Flags {
     #[derivative(Default(value = "\"tcp\".to_string()"))]
     pub default_protocol: String,
+    #[derivative(Default(value = "\"tun\".to_string()"))]
+    pub dev_name: String,
     #[derivative(Default(value = "true"))]
     pub enable_encryption: bool,
     #[derivative(Default(value = "true"))]
@@ -160,6 +162,10 @@ pub struct Flags {
     pub latency_first: bool,
     #[derivative(Default(value = "false"))]
     pub enable_exit_node: bool,
+    #[derivative(Default(value = "false"))]
+    pub no_tun: bool,
+    #[derivative(Default(value = "false"))]
+    pub use_smoltcp: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]

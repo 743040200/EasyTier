@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import Stepper from 'primevue/stepper'
-import StepperPanel from 'primevue/stepperpanel'
-
 import { useToast } from 'primevue/usetoast'
 
-import { exit } from '@tauri-apps/api/process'
+import { exit } from '@tauri-apps/plugin-process';
 import Config from '~/components/Config.vue'
 import Status from '~/components/Status.vue'
 
@@ -12,10 +9,18 @@ import type { NetworkConfig } from '~/types/network'
 import { loadLanguageAsync } from '~/modules/i18n'
 import { getAutoLaunchStatusAsync as getAutoLaunchStatus, loadAutoLaunchStatusAsync } from '~/modules/auto_launch'
 import { loadRunningInstanceIdsFromLocalStorage } from '~/stores/network'
+import { setLoggingLevel } from '~/composables/network'
+import TieredMenu from 'primevue/tieredmenu'
+import { open } from '@tauri-apps/plugin-shell';
+import { appLogDir } from '@tauri-apps/api/path'
+import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { useTray } from '~/composables/tray';
 
 const { t, locale } = useI18n()
 const visible = ref(false)
 const tomlConfig = ref('')
+
+useTray(true)
 
 const items = ref([
   {
@@ -76,8 +81,8 @@ networkStore.$subscribe(async () => {
   }
 })
 
-async function runNetworkCb(cfg: NetworkConfig, cb: (e: MouseEvent) => void) {
-  cb({} as MouseEvent)
+async function runNetworkCb(cfg: NetworkConfig, cb: () => void) {
+  cb()
   networkStore.removeNetworkInstance(cfg.instance_id)
   await retainNetworkInstance(networkStore.networkInstanceIds)
   networkStore.addNetworkInstance(cfg.instance_id)
@@ -91,9 +96,9 @@ async function runNetworkCb(cfg: NetworkConfig, cb: (e: MouseEvent) => void) {
   }
 }
 
-async function stopNetworkCb(cfg: NetworkConfig, cb: (e: MouseEvent) => void) {
+async function stopNetworkCb(cfg: NetworkConfig, cb: () => void) {
   // console.log('stopNetworkCb', cfg, cb)
-  cb({} as MouseEvent)
+  cb()
   networkStore.removeNetworkInstance(cfg.instance_id)
   await retainNetworkInstance(networkStore.networkInstanceIds)
 }
@@ -103,44 +108,85 @@ async function updateNetworkInfos() {
 }
 
 let intervalId = 0
-onMounted(() => {
+onMounted(async () => {
   intervalId = window.setInterval(async () => {
     await updateNetworkInfos()
   }, 500)
+  await setTrayMenu([ 
+    await MenuItemExit(t('tray.exit')), 
+    await MenuItemShow(t('tray.show')) 
+  ])
 })
 onUnmounted(() => clearInterval(intervalId))
 
 const activeStep = computed(() => {
-  return networkStore.networkInstanceIds.includes(networkStore.curNetworkId) ? 1 : 0
+  return networkStore.networkInstanceIds.includes(networkStore.curNetworkId) ? '2' : '1'
 })
+
+let current_log_level = 'off'
 
 const setting_menu = ref()
 const setting_menu_items = ref([
   {
-    label: () => t('settings'),
-    items: [
-      {
-        label: () => t('exchange_language'),
-        icon: 'pi pi-language',
+    label: () => t('exchange_language'),
+    icon: 'pi pi-language',
+    command: async () => {
+      await loadLanguageAsync((locale.value === 'en' ? 'cn' : 'en'))
+      await setTrayMenu([ 
+        await MenuItemExit(t('tray.exit')), 
+        await MenuItemShow(t('tray.show')) 
+      ])
+    },
+  },
+  {
+    label: () => getAutoLaunchStatus() ? t('disable_auto_launch') : t('enable_auto_launch'),
+    icon: 'pi pi-desktop',
+    command: async () => {
+      await loadAutoLaunchStatusAsync(!getAutoLaunchStatus())
+    },
+  },
+  {
+    label: () => t('logging'),
+    icon: 'pi pi-file',
+    items: (function () {
+      const levels = ['off', 'warn', 'info', 'debug', 'trace']
+      let items = []
+      for (let level of levels) {
+        items.push({
+          label: () => t("logging_level_" + level) + (current_log_level === level ? ' ✓' : ''),
+          command: async () => {
+            current_log_level = level
+            await setLoggingLevel(level)
+          },
+        })
+      }
+      items.push({
+        separator: true,
+      })
+      items.push({
+        label: () => t('logging_open_dir'),
+        icon: 'pi pi-folder-open',
         command: async () => {
-          await loadLanguageAsync((locale.value === 'en' ? 'cn' : 'en'))
+          console.log("open log dir", await appLogDir())
+          await open(await appLogDir())
         },
-      },
-      {
-        label: () => getAutoLaunchStatus() ? t('disable_auto_launch') : t('enable_auto_launch'),
-        icon: 'pi pi-desktop',
+      })
+      items.push({
+        label: () => t('logging_copy_dir'),
+        icon: 'pi pi-tablet',
         command: async () => {
-          await loadAutoLaunchStatusAsync(!getAutoLaunchStatus())
+          await writeText(await appLogDir())
         },
-      },
-      {
-        label: () => t('exit'),
-        icon: 'pi pi-power-off',
-        command: async () => {
-          await exit(1)
-        },
-      },
-    ],
+      })
+      return items
+    })()
+  },
+  {
+    label: () => t('exit'),
+    icon: 'pi pi-power-off',
+    command: async () => {
+      await exit(1)
+    },
   },
 ])
 
@@ -231,30 +277,34 @@ function isRunning(id: string) {
         <template #end>
           <Button icon="pi pi-cog" class="mr-2" severity="secondary" aria-haspopup="true" :label="t('settings')"
             aria-controls="overlay_setting_menu" @click="toggle_setting_menu" />
-          <Menu id="overlay_setting_menu" ref="setting_menu" :model="setting_menu_items" :popup="true" />
+          <TieredMenu id="overlay_setting_menu" ref="setting_menu" :model="setting_menu_items" :popup="true" />
         </template>
       </Toolbar>
     </div>
 
-    <Stepper class="h-full overflow-y-auto" :active-step="activeStep">
-      <StepperPanel :header="t('config_network')">
-        <template #content="{ nextCallback }">
-          <Config :instance-id="networkStore.curNetworkId" :config-invalid="messageBarSeverity !== Severity.None"
-            @run-network="runNetworkCb($event, nextCallback)" />
-        </template>
-      </StepperPanel>
-      <StepperPanel :header="t('running')">
-        <template #content="{ prevCallback }">
-          <div class="flex flex-column">
-            <Status :instance-id="networkStore.curNetworkId" />
-          </div>
-          <div class="flex pt-4 justify-content-center">
-            <Button :label="t('stop_network')" severity="danger" icon="pi pi-arrow-left"
-              @click="stopNetworkCb(networkStore.curNetwork, prevCallback)" />
-          </div>
-        </template>
-      </StepperPanel>
-    </Stepper>
+    <Panel class="h-full overflow-y-auto" >
+      <Stepper :value="activeStep">
+        <StepList value="1">
+          <Step value="1">{{ t('config_network') }}</Step>
+          <Step value="2">{{ t('running') }}</Step>
+        </StepList>
+        <StepPanels value="1">
+          <StepPanel v-slot="{ activateCallback = (s: string) => {} } = {}" value="1">
+              <Config :instance-id="networkStore.curNetworkId" :config-invalid="messageBarSeverity !== Severity.None"
+                @run-network="runNetworkCb($event, () => activateCallback('2'))" />
+          </StepPanel>
+          <StepPanel v-slot="{ activateCallback = (s: string) => {} } = {}" value="2">
+              <div class="flex flex-column">
+                <Status :instance-id="networkStore.curNetworkId" />
+              </div>
+              <div class="flex pt-4 justify-content-center">
+                <Button :label="t('stop_network')" severity="danger" icon="pi pi-arrow-left"
+                  @click="stopNetworkCb(networkStore.curNetwork, () => activateCallback('1'))" />
+              </div>
+          </StepPanel>
+        </StepPanels>
+      </Stepper>
+    </Panel>
 
     <div>
       <Menubar :model="items" breakpoint="300px" />

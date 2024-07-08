@@ -8,16 +8,15 @@ use auto_launch::AutoLaunchBuilder;
 use dashmap::DashMap;
 use easytier::{
     common::config::{
-        ConfigLoader, NetworkIdentity, PeerConfig, TomlConfigLoader, VpnPortalConfig,
+        ConfigLoader, FileLoggerConfig, NetworkIdentity, PeerConfig, TomlConfigLoader,
+        VpnPortalConfig,
     },
     launcher::{NetworkInstance, NetworkInstanceRunningInfo},
+    utils::{self, NewFilterSender},
 };
 use serde::{Deserialize, Serialize};
 
-use tauri::{
-    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
-    Window,
-};
+use tauri::Manager as _;
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 enum NetworkingMethod {
@@ -31,6 +30,8 @@ impl Default for NetworkingMethod {
         NetworkingMethod::PublicServer
     }
 }
+
+use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 struct NetworkConfig {
@@ -165,6 +166,9 @@ impl NetworkConfig {
 static INSTANCE_MAP: once_cell::sync::Lazy<DashMap<String, NetworkInstance>> =
     once_cell::sync::Lazy::new(DashMap::new);
 
+static mut LOGGER_LEVEL_SENDER: once_cell::sync::Lazy<Option<NewFilterSender>> =
+    once_cell::sync::Lazy::new(Default::default);
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn parse_network_config(cfg: NetworkConfig) -> Result<String, String> {
@@ -222,12 +226,21 @@ fn set_auto_launch_status(app_handle: tauri::AppHandle, enable: bool) -> Result<
     Ok(init_launch(&app_handle, enable).map_err(|e| e.to_string())?)
 }
 
-fn toggle_window_visibility(window: &Window) {
-    if window.is_visible().unwrap() {
-        window.hide().unwrap();
-    } else {
-        window.show().unwrap();
-        window.set_focus().unwrap();
+#[tauri::command]
+fn set_logging_level(level: String) -> Result<(), String> {
+    let sender = unsafe { LOGGER_LEVEL_SENDER.as_ref().unwrap() };
+    sender.send(level).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+fn toggle_window_visibility<R: tauri::Runtime>(app: &tauri::AppHandle<R>) {
+    if let Some(window) = app.get_webview_window("main") {
+        if window.is_visible().unwrap_or_default() {
+            let _ = window.hide();
+        } else {
+            let _ = window.show();
+            let _ = window.set_focus();
+        }
     }
 }
 
@@ -306,47 +319,57 @@ fn main() {
     if !check_sudo() {
         process::exit(0);
     }
-    let quit = CustomMenuItem::new("quit".to_string(), "退出 Quit");
-    let hide = CustomMenuItem::new("hide".to_string(), "显示 Show / 隐藏 Hide");
-    let tray_menu = SystemTrayMenu::new()
-        .add_item(quit)
-        .add_native_item(SystemTrayMenuItem::Separator)
-        .add_item(hide);
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_shell::init())
+        .setup(|app| {
+            // for logging config
+            let Ok(log_dir) = app.path().app_log_dir() else {
+                return Ok(());
+            };
+            let config = TomlConfigLoader::default();
+            config.set_file_logger_config(FileLoggerConfig {
+                dir: Some(log_dir.to_string_lossy().to_string()),
+                level: None,
+                file: None,
+            });
+            let Ok(Some(logger_reinit)) = utils::init_logger(config, true) else {
+                return Ok(());
+            };
+            unsafe { LOGGER_LEVEL_SENDER.replace(logger_reinit) };
+
+            // for tray icon, menu need to be built in js
+            let _tray_menu = TrayIconBuilder::with_id("main")
+                .menu_on_left_click(false)
+                .on_tray_icon_event(|tray, event| {
+                    if let TrayIconEvent::Click {
+                        button: MouseButton::Left,
+                        button_state: MouseButtonState::Up,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        toggle_window_visibility(app);
+                    }
+                })
+                .build(app)?;
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             parse_network_config,
             run_network_instance,
             retain_network_instance,
             collect_network_infos,
             get_os_hostname,
-            set_auto_launch_status
+            set_auto_launch_status,
+            set_logging_level
         ])
-        .system_tray(SystemTray::new().with_menu(tray_menu))
-        .on_system_tray_event(|app, event| match event {
-            SystemTrayEvent::DoubleClick {
-                position: _,
-                size: _,
-                ..
-            } => {
-                let window = app.get_window("main").unwrap();
-                toggle_window_visibility(&window);
-            }
-            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
-                "quit" => {
-                    std::process::exit(0);
-                }
-                "hide" => {
-                    let window = app.get_window("main").unwrap();
-                    toggle_window_visibility(&window);
-                }
-                _ => {}
-            },
-            _ => {}
-        })
-        .on_window_event(|event| match event.event() {
+        .on_window_event(|win, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
-                event.window().hide().unwrap();
+                let _ = win.hide();
                 api.prevent_close();
             }
             _ => {}
