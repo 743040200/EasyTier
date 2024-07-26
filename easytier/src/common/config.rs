@@ -61,6 +61,9 @@ pub trait ConfigLoader: Send + Sync {
     fn get_exit_nodes(&self) -> Vec<Ipv4Addr>;
     fn set_exit_nodes(&self, nodes: Vec<Ipv4Addr>);
 
+    fn get_routes(&self) -> Option<Vec<cidr::Ipv4Cidr>>;
+    fn set_routes(&self, routes: Option<Vec<cidr::Ipv4Cidr>>);
+
     fn dump(&self) -> String;
 }
 
@@ -150,7 +153,7 @@ pub struct VpnPortalConfig {
 pub struct Flags {
     #[derivative(Default(value = "\"tcp\".to_string()"))]
     pub default_protocol: String,
-    #[derivative(Default(value = "\"tun\".to_string()"))]
+    #[derivative(Default(value = "\"\".to_string()"))]
     pub dev_name: String,
     #[derivative(Default(value = "true"))]
     pub enable_encryption: bool,
@@ -189,6 +192,8 @@ struct Config {
     rpc_portal: Option<SocketAddr>,
 
     vpn_portal_config: Option<VpnPortalConfig>,
+
+    routes: Option<Vec<cidr::Ipv4Cidr>>,
 
     flags: Option<Flags>,
 }
@@ -487,6 +492,14 @@ impl ConfigLoader for TomlConfigLoader {
     fn dump(&self) -> String {
         toml::to_string_pretty(&*self.config.lock().unwrap()).unwrap()
     }
+
+    fn get_routes(&self) -> Option<Vec<cidr::Ipv4Cidr>> {
+        self.config.lock().unwrap().routes.clone()
+    }
+
+    fn set_routes(&self, routes: Option<Vec<cidr::Ipv4Cidr>>) {
+        self.config.lock().unwrap().routes = routes;
+    }
 }
 
 #[cfg(test)]
@@ -500,6 +513,7 @@ instance_name = "default"
 instance_id = "87ede5a2-9c3d-492d-9bbe-989b9d07e742"
 ipv4 = "10.144.144.10"
 listeners = [ "tcp://0.0.0.0:11010", "udp://0.0.0.0:11010" ]
+routes = [ "192.168.0.0/16" ]
 
 [network_identity]
 network_name = "default"
