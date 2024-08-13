@@ -12,6 +12,11 @@ on:
         required: true
         default: true
         type: boolean
+      rel:
+        description: '是否发布离线镜像包'
+        required: true
+        default: true
+        type: boolean
 
 env:
   tags: "${{ github.event.inputs.tag }}"
@@ -91,3 +96,38 @@ jobs:
           lmq8267/easytier:${{ env.tags }}
          platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/arm/v6
          context: /opt
+      - name: Save Docker Image
+        if: github.event.inputs.rel == 'true'
+        run: |
+          mkdir -p /opt/dk
+          docker pull --platform linux/amd64 lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-amd64.tar lmq8267/easytier:${{ env.tags }}
+
+          docker pull --platform linux/386 lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-386.tar lmq8267/easytier:${{ env.tags }}
+
+          docker pull --platform linux/arm64 lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-arm64.tar lmq8267/easytier:${{ env.tags }}
+
+          docker pull --platform linux/arm/v7 lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-armv7.tar lmq8267/easytier:${{ env.tags }}
+
+          docker pull --platform linux/arm/v6 lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-armv6.tar lmq8267/easytier:${{ env.tags }}
+          echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
+      - name: release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.c8 }}
+          body: |
+           > ### 编译时间 ：${{ env.build_time }}
+           
+           其中 arm armv7 
+           -musleabi：只支持软件浮点的设备
+           -musleabihf：支持硬件浮点的设备
+           
+           [官方更新说明](https://github.com/EasyTier/EasyTier/releases)
+           
+          tag_name: ${{ env.tags }}
+          files: /opt/dk/*
+          
