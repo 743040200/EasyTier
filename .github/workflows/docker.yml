@@ -101,19 +101,19 @@ jobs:
         run: |
           mkdir -p /opt/dk
           docker pull --platform linux/amd64 lmq8267/easytier:${{ env.tags }}
-          docker save -o /opt/dk/easytier-amd64.tar lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-amd64-docker.tar lmq8267/easytier:${{ env.tags }}
 
           docker pull --platform linux/386 lmq8267/easytier:${{ env.tags }}
-          docker save -o /opt/dk/easytier-386.tar lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-386-docker.tar lmq8267/easytier:${{ env.tags }}
 
           docker pull --platform linux/arm64 lmq8267/easytier:${{ env.tags }}
-          docker save -o /opt/dk/easytier-arm64.tar lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-arm64-docker.tar lmq8267/easytier:${{ env.tags }}
 
           docker pull --platform linux/arm/v7 lmq8267/easytier:${{ env.tags }}
-          docker save -o /opt/dk/easytier-armv7.tar lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-armv7-docker.tar lmq8267/easytier:${{ env.tags }}
 
           docker pull --platform linux/arm/v6 lmq8267/easytier:${{ env.tags }}
-          docker save -o /opt/dk/easytier-armv6.tar lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-armv5-docker.tar lmq8267/easytier:${{ env.tags }}
           echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
       - name: release
         uses: softprops/action-gh-release@v2
@@ -125,6 +125,7 @@ jobs:
            其中 arm armv7 
            -musleabi：只支持软件浮点的设备
            -musleabihf：支持硬件浮点的设备
+           -docker.tar  docker离线镜像包
            
            [官方更新说明](https://github.com/EasyTier/EasyTier/releases)
            
