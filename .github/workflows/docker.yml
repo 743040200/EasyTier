@@ -101,7 +101,7 @@ jobs:
         run: |
           mkdir -p /opt/dk
           docker pull --platform linux/amd64 lmq8267/easytier:${{ env.tags }}
-          docker save -o /opt/dk/easytier-amd64-docker.tar lmq8267/easytier:${{ env.tags }}
+          docker save -o /opt/dk/easytier-x86_64-docker.tar lmq8267/easytier:${{ env.tags }}
 
           docker pull --platform linux/386 lmq8267/easytier:${{ env.tags }}
           docker save -o /opt/dk/easytier-386-docker.tar lmq8267/easytier:${{ env.tags }}
