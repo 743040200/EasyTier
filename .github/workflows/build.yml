@@ -249,9 +249,9 @@ jobs:
               export CARGO_TERM_COLOR=always
               export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
               cargo build --release --target x86_64-unknown-freebsd
-              file ./target/${{ env.TARGET }}/release/easytier-core 
+              ./target/${{ env.TARGET }}/release/easytier-core -h
       - name: 压缩
-        if: ${{ matrix.TARGET != 'x86_64-freebsd' && github.event.inputs.upx != 'false' }}
+        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
         run: |
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-core
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-cli
