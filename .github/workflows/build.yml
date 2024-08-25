@@ -233,18 +233,18 @@ jobs:
               sudo pkg install -y git protobuf
               tagg=${{ env.BRANCHES }}
               [[ -z $tagg ]] && tagg=main
-              sudo git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
-              cd /opt/et
-              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+              sudo curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
               source $HOME/.cargo/env
               rustup set auto-self-update disable
               rustup install 1.77
               rustup default 1.77
+              sudo git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
+              cd /opt/et
               export CC=clang
               export CXX=clang++
               export CARGO_TERM_COLOR=always
               export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
-              cargo build --release --target x86_64-unknown-freebsd
+              sudo cargo build --release --target x86_64-unknown-freebsd
               file ./target/${{ env.TARGET }}/release/easytier-core 
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-freebsd' && github.event.inputs.upx != 'false' }}
