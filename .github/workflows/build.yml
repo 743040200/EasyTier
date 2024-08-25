@@ -206,7 +206,6 @@ jobs:
           [[ -z $tagg ]] && tagg=main
           git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
           cd /opt/et
-          mkdir -p /opt/bin
           #改成只使用中文帮助信息
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier/src/easytier-core.rs
           if [[ $TARGET =~ ^mips.*$ ]]; then
@@ -265,6 +264,7 @@ jobs:
           mv -f ./easytier-core /opt/et/target/${{ env.TARGET }}/release/easytier-core
           mv -f ./easytier-cli /opt/et/target/${{ env.TARGET }}/release/easytier-cli
           fi
+          mkdir -p /opt/bin
           cd /opt/et/target/${{ env.TARGET }}/release
           file easytier-core
           tar -czvf easytier-${{ env.NAME }}.tar.gz easytier-core easytier-cli
