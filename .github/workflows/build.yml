@@ -231,6 +231,7 @@ jobs:
           cpu_count: 4
           run: |
               sudo pkg install -y git protobuf
+              homedir=$(pwd)
               sudo mkdir -p /opt
               sudo chown -R $(whoami) /opt/
               tagg=${{ env.BRANCHES }}
@@ -250,6 +251,8 @@ jobs:
               export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
               cargo build --release --target x86_64-unknown-freebsd
               ./target/${{ env.TARGET }}/release/easytier-core -h
+              mv -f target/${{ env.TARGET }}/release/easytier-core ${homedir}/easytier-core
+              mv -f target/${{ env.TARGET }}/release/easytier-cli ${homedir}/easytier-cli
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
         run: |
@@ -257,6 +260,11 @@ jobs:
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-cli
       - name: 打包
         run: |
+          if [[ $TARGET == 'x86_64-unknown-freebsd' ]]; then
+          mkdir -p /opt/et/target/${{ env.TARGET }}/release
+          mv -f ./easytier-core /opt/et/target/${{ env.TARGET }}/release/easytier-core
+          mv -f ./easytier-cli /opt/et/target/${{ env.TARGET }}/release/easytier-cli
+          fi
           cd /opt/et/target/${{ env.TARGET }}/release
           file easytier-core
           tar -czvf easytier-${{ env.NAME }}.tar.gz easytier-core easytier-cli
