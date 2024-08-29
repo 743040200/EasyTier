@@ -263,6 +263,8 @@ jobs:
           mkdir -p /opt/et/target/${{ env.TARGET }}/release
           mv -f ./easytier-core /opt/et/target/${{ env.TARGET }}/release/easytier-core
           mv -f ./easytier-cli /opt/et/target/${{ env.TARGET }}/release/easytier-cli
+          echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
+          echo "tags=$(date '+%Y%m%d')" >> $GITHUB_ENV
           fi
           mkdir -p /opt/bin
           cd /opt/et/target/${{ env.TARGET }}/release
