@@ -110,7 +110,7 @@ jobs:
       URL: ${{ matrix.URL }}
       NAME: ${{ matrix.NAME }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 下载编译工具
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: |
