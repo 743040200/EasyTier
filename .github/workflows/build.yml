@@ -111,6 +111,8 @@ jobs:
       NAME: ${{ matrix.NAME }}
     steps:
       - uses: actions/checkout@v4
+      - name: 安装最新 Protoc
+        uses: arduino/setup-protoc@v3
       - name: 下载编译工具
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: |
@@ -122,7 +124,7 @@ jobs:
           wget -q -c https://musl.cc/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
           tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
           sudo ln -s /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
-          sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools protobuf-compiler
+          sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
             cp libgcc_eh.a libunwind.a
@@ -209,9 +211,9 @@ jobs:
           #改成只使用中文帮助信息
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier/src/easytier-core.rs
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             CARGO_ENV="--experimental_allow_proto3_optional" cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --features mips
+             cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --features mips
           else
-             CARGO_ENV="--experimental_allow_proto3_optional" cargo build --release --target ${{ env.TARGET }}
+             cargo build --release --target ${{ env.TARGET }}
           fi
           
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
