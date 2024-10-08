@@ -227,7 +227,7 @@ jobs:
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
           else
-             echo "tags=$(date '+%Y%m%d')" >> $GITHUB_ENV
+             echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
           fi
       - name: 编译FreeBSD
         if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
@@ -278,7 +278,7 @@ jobs:
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
           else
-             echo "tags=$(date '+%Y%m%d')" >> $GITHUB_ENV
+             echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
           fi
           fi
           mkdir -p /opt/bin
@@ -323,7 +323,7 @@ jobs:
            
            [官方更新说明](https://github.com/EasyTier/EasyTier/releases)
            
-          tag_name: ${{ needs.check.outputs.ver }}-${{ env.tags }}
+          tag_name: ${{ env.tags }}
           prerelease: true
           files: /opt/et/target/${{ env.TARGET }}/release/easytier-${{ env.NAME }}.tar.gz
 
