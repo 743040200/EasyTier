@@ -24,10 +24,6 @@ on:
         required: true
         default: true
         type: boolean
-      reltag:
-        description: '自定义发布的版本号'
-        required: false
-        default: ''
       rel:
         description: '请选择发布版本'
         required: true
@@ -36,6 +32,10 @@ on:
         options:
           - release
           - prerelease
+      reltag:
+        description: '自定义prerelease预发布的版本号'
+        required: false
+        default: ''
 
 env:
   BRANCHES: "${{ github.event.inputs.tag }}"
