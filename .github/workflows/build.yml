@@ -24,6 +24,10 @@ on:
         required: true
         default: true
         type: boolean
+      reltag:
+        description: '自定义发布的版本号'
+        required: false
+        default: ''
       rel:
         description: '请选择发布版本'
         required: true
@@ -35,6 +39,7 @@ on:
 
 env:
   BRANCHES: "${{ github.event.inputs.tag }}"
+  RELTAG: "${{ github.event.inputs.reltag }}"
   CARGO_TERM_COLOR: always
   TZ: Asia/Shanghai
   
@@ -219,7 +224,11 @@ jobs:
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-cli
           echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
-          echo "tags=$(date '+%Y%m%d')" >> $GITHUB_ENV
+          if [[ ! -z "$RELTAG: ]] ; then
+             echo "tags=$RELTAG" >> $GITHUB_ENV
+          else
+             echo "tags=$(date '+%Y%m%d')" >> $GITHUB_ENV
+          fi
       - name: 编译FreeBSD
         if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
         uses: cross-platform-actions/action@v0.23.0
