@@ -216,7 +216,7 @@ jobs:
           #改成只使用中文帮助信息
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier/src/easytier-core.rs
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --features mips
+             cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --features mips --package=easytier
           else
              cargo build --release --target ${{ env.TARGET }}
           fi
