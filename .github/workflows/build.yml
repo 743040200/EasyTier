@@ -266,7 +266,7 @@ jobs:
               ./target/${{ env.TARGET }}/release/easytier-core -h
               mv -f target/${{ env.TARGET }}/release/easytier-core ${homedir}/easytier-core
               mv -f target/${{ env.TARGET }}/release/easytier-cli ${homedir}/easytier-cli
-              mv -f target/${{ env.TARGET }}/release/easytier-cli ${homedir}/easytier-web
+              mv -f target/${{ env.TARGET }}/release/easytier-web ${homedir}/easytier-web
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
         run: |
