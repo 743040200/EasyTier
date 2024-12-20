@@ -1,0 +1,69 @@
+name: 打包WEB网页
+
+on:
+ # 设置每天凌晨6点打包（北京时区+8）
+  schedule: 
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: '请输入EasyTier源码仓库'
+        required: true
+        default: 'EasyTier/EasyTier'
+      branch:
+        description: '请输入仓库的分支或版本号，默认main分支'
+        required: true
+        default: 'main'
+env:
+  branch: "${{ github.event.inputs.branch }}"
+  repo: "${{ github.event.inputs.repo }}"
+  CARGO_TERM_COLOR: always
+  TZ: Asia/Shanghai
+  
+#设置仓库权限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+#只允许一个并发部署，跳过在正在进行的部署和最新排队的部署之间排队的任务。
+#但是，不要取消正在进行的部署，因为我们希望这些生产环境的部署完成。
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # 只执行单个部署任务，因为我们只是进行部署。
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      - name: 克隆源码
+        run: git clone -b ${{ github.event.inputs.branch }} https://github.com/${{ github.event.inputs.repo }} /opt/et
+      - name: 设置Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21' # 使用的 Node.js 版本，可调整
+      - name: 安装pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          run_install: false
+      - name: 构建 HTML
+        run: |
+          cd /opt/et
+          pnpm -r install
+          pnpm -r build
+      - name: 设置页面
+        uses: actions/configure-pages@v5
+      - name: 上传文件
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '/opt/et/easytier-web/frontend/dist'
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
