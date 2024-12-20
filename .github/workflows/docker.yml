@@ -94,7 +94,7 @@ jobs:
           echo "RUN echo '  echo \"Docker环境变量 WEB=1 未设置，默认运行 /usr/bin/easytier-core\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'fi' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo 'exec \"\$APP_EXEC\" \"\$@\"' >> /usr/bin/entrypoint.sh" >> ./Dockerfile
+          echo "RUN echo 'exec \"\$APP_EXEC\" \"\$@\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN chmod +x /usr/bin/easytier.sh" >> ./Dockerfile
 
           # 设置 ENTRYPOINT
