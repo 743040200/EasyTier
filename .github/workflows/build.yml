@@ -218,13 +218,14 @@ jobs:
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-core.rs
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-cli.rs
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --features mips --package=easytier
+             cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --features mips
           else
              cargo build --release --target ${{ env.TARGET }}
           fi
           
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-cli
+          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-web
           echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
@@ -265,17 +266,20 @@ jobs:
               ./target/${{ env.TARGET }}/release/easytier-core -h
               mv -f target/${{ env.TARGET }}/release/easytier-core ${homedir}/easytier-core
               mv -f target/${{ env.TARGET }}/release/easytier-cli ${homedir}/easytier-cli
+              mv -f target/${{ env.TARGET }}/release/easytier-cli ${homedir}/easytier-web
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
         run: |
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-core
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-cli
+          upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-web
       - name: 打包
         run: |
           if [[ $TARGET == 'x86_64-unknown-freebsd' ]]; then
           mkdir -p /opt/et/target/${{ env.TARGET }}/release
           mv -f ./easytier-core /opt/et/target/${{ env.TARGET }}/release/easytier-core
           mv -f ./easytier-cli /opt/et/target/${{ env.TARGET }}/release/easytier-cli
+          mv -f ./easytier-web /opt/et/target/${{ env.TARGET }}/release/easytier-web
           echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
@@ -286,9 +290,10 @@ jobs:
           mkdir -p /opt/bin
           cd /opt/et/target/${{ env.TARGET }}/release
           file easytier-core
-          tar -czvf easytier-${{ env.NAME }}.tar.gz easytier-core easytier-cli
+          tar -czvf easytier-${{ env.NAME }}.tar.gz easytier-core easytier-cli easytier-web
           cp -f ./easytier-core /opt/bin/easytier-core
           cp -f ./easytier-cli /opt/bin/easytier-cli
+          cp -f ./easytier-web /opt/bin/easytier-web
       - name: 上传
         uses: actions/upload-artifact@v4
         if: always()
