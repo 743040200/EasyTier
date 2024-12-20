@@ -103,6 +103,8 @@ jobs:
           echo "EXPOSE 11011/udp" >> ./Dockerfile
           echo "EXPOSE 11011/tcp" >> ./Dockerfile
           echo "EXPOSE 11012/tcp" >> ./Dockerfile
+          echo "EXPOSE 22020/udp" >> ./Dockerfile
+          echo "EXPOSE 11211/tcp" >> ./Dockerfile
           echo "ENTRYPOINT [\"/usr/bin/easytier.sh\"]" >> ./Dockerfile
           
       - name: Setup QEMU
