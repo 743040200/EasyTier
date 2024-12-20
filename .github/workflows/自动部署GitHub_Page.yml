@@ -15,8 +15,8 @@ on:
         required: true
         default: 'main'
 env:
-  branch: "${{ github.event.inputs.branch }}"
-  repo: "${{ github.event.inputs.repo }}"
+  branch: ${{ github.event.inputs.branch || 'main' }} # 为 branch 设置默认值
+  repo: ${{ github.event.inputs.repo || 'EasyTier/EasyTier' }} # 为 repo 设置默认值
   CARGO_TERM_COLOR: always
   TZ: Asia/Shanghai
   
@@ -43,7 +43,7 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
       - name: 克隆源码
-        run: git clone -b ${{ github.event.inputs.branch }} https://github.com/${{ github.event.inputs.repo }} /opt/et
+        run: git clone -b ${{ env.branch }} https://github.com/${{ env.repo }} /opt/et
       - name: 设置Node.js
         uses: actions/setup-node@v4
         with:
