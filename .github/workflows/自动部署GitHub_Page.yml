@@ -71,7 +71,9 @@ jobs:
         run: |
           #将构建出的html文件通过scp命令复制到文件服务器里
           sudo apt-get install -y sshpass
-          sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r /opt/et/easytier-web/frontend/dist/* lmq8267@s1.ct8.pl:/usr/home/lmq8267/opt/caddy/easytier/web/
+          cp -rf /opt/et/easytier-web/frontend/dist /opt/dist
+          mv /opt/dist/index.html /opt/dist.web.html
+          sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r /opt/dist/* lmq8267@s1.ct8.pl:/usr/home/lmq8267/opt/caddy/easytier/web/
       - name: 设置页面
         uses: actions/configure-pages@v5
       - name: 上传文件
