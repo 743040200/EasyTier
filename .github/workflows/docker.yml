@@ -85,7 +85,7 @@ jobs:
           echo "ARG TARGETARCH" >> ./Dockerfile
           echo "ARG TARGETVARIANT" >> ./Dockerfile
           echo "RUN apk add --no-cache tzdata caddy" >> ./Dockerfile
-          echo "WORKDIR /app" >> ./Dockerfile
+          echo "RUN mkdir -p /app" >> ./Dockerfile
           echo "COPY dist /app/dist" >> ./Dockerfile
           echo "ADD easytier-core_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-core" >> ./Dockerfile
           echo "ADD easytier-cli_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-cli" >> ./Dockerfile
@@ -107,9 +107,9 @@ jobs:
           echo "RUN echo '# 判断环境变量 WEB 的值' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'if [ \"\$WEB\" = \"1\" ]; then' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '  echo \"Docker环境变量 WEB=1 已设置，运行 /usr/bin/easytier-web\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          #echo "RUN echo '  APP_EXEC=\"/usr/bin/easytier-web\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo ' caddy file-server --listen :8080 --root /app/dist &' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '  echo \"运行caddy 静态网页， 请映射8080端口\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
+          echo "RUN echo 'cd /app' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'exec ./easytier-web ' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'else' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '  echo \"Docker环境变量 WEB=1 未设置，默认运行 /usr/bin/easytier-core\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
@@ -128,6 +128,7 @@ jobs:
           echo "EXPOSE 11211/tcp" >> ./Dockerfile
           echo "EXPOSE 8080/tcp" >> ./Dockerfile
           echo "VOLUME /app" >> ./Dockerfile
+          echo "WORKDIR /app" >> ./Dockerfile
           echo "ENTRYPOINT [\"/usr/bin/easytier.sh\"]" >> ./Dockerfile
           
       - name: Setup QEMU
