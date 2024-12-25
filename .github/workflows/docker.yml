@@ -89,10 +89,10 @@ jobs:
           echo "COPY dist /app/dist" >> ./Dockerfile
           echo "ADD easytier-core_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-core" >> ./Dockerfile
           echo "ADD easytier-cli_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-cli" >> ./Dockerfile
-          echo "ADD easytier-web_\$TARGETARCH\$TARGETVARIANT /app/easytier-web" >> ./Dockerfile 
+          echo "ADD easytier-web_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-web" >> ./Dockerfile 
           echo "RUN chmod +x /usr/bin/easytier-core" >> ./Dockerfile
           echo "RUN chmod +x /usr/bin/easytier-cli" >> ./Dockerfile
-          echo "RUN chmod +x /app/easytier-web" >> ./Dockerfile
+          echo "RUN chmod +x /usr/bin/easytier-web" >> ./Dockerfile
           echo "ENV TZ Asia/Shanghai" >> ./Dockerfile
 
           # 生成 easytier.sh 脚本
@@ -110,6 +110,7 @@ jobs:
           echo "RUN echo ' caddy file-server --listen :8080 --root /app/dist &' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '  echo \"运行caddy 静态网页， 请映射8080端口\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'cd /app' >> /usr/bin/easytier.sh" >> ./Dockerfile
+          echo "RUN echo 'cp -rf /usr/bin/easytier-web /app/easytier-web' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'exec ./easytier-web ' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'else' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '  echo \"Docker环境变量 WEB=1 未设置，默认运行 /usr/bin/easytier-core\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
