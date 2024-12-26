@@ -180,6 +180,7 @@ jobs:
           docker save -o /opt/dk/easytier-armv5-docker.tar lmq8267/easytier:${{ env.tags }}
           echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
       - name: release
+        if: github.event.inputs.rel == 'true'
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.c8 }}
