@@ -345,6 +345,11 @@ jobs:
           tag_name: ${{ env.tags }}
           prerelease: true
           files: /opt/et/target/${{ env.TARGET }}/release/easytier-${{ env.NAME }}.tar.gz
+      - name: 打包镜像
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: docker.yml
+          inputs: '{ "tag": "${{ env.tags }}", "latest": true , "rel": true}'
 
  keepalive-workflow:
     # github超过60天未提交将自动停止工作流
