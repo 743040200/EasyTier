@@ -42,7 +42,9 @@ env:
   RELTAG: "${{ github.event.inputs.reltag }}"
   CARGO_TERM_COLOR: always
   TZ: Asia/Shanghai
-  
+permissions:
+  contents: write
+  actions: write
 jobs:
  check:
   runs-on: ubuntu-latest
@@ -58,11 +60,11 @@ jobs:
       echo "ver=${ver}" >> $GITHUB_OUTPUT
       echo "cver=${cver}" >> $GITHUB_OUTPUT
   -  name: 删除工作流
-     uses: GitRML/delete-workflow-runs@main
+     uses: Mattraks/delete-workflow-runs@main
      with:
-        token: ${{ secrets.c8 }}
-        retain_days: 2
-        keep_minimum_runs: 1
+        token: ${{ secrets.GITHUB_TOKEN }}
+        retain_days: 0
+        keep_minimum_runs: 0
  build:
     needs: check
     if: ${{ github.event.inputs.bj == 'true' || (github.event.inputs.bj != 'true' && needs.check.outputs.ver != needs.check.outputs.cver) }}
@@ -316,7 +318,7 @@ jobs:
         if: github.event.inputs.fb != 'false' && github.event.inputs.rel != 'prerelease'
         uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.c8 }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
            > ### 编译时间 ：${{ env.build_time }}
            
@@ -357,6 +359,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       actions: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: gautamkrishnar/keepalive-workflow@v2
