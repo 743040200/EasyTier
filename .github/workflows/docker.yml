@@ -94,6 +94,7 @@ jobs:
           echo "RUN chmod +x /usr/bin/easytier-cli" >> ./Dockerfile
           echo "RUN chmod +x /usr/bin/easytier-web" >> ./Dockerfile
           echo "ENV TZ Asia/Shanghai" >> ./Dockerfile
+          echo "ENV LANG=zh_CN" >> ./Dockerfile
 
           # 生成 easytier.sh 脚本
           echo "RUN echo '#!/bin/sh' > /usr/bin/easytier.sh" >> ./Dockerfile
