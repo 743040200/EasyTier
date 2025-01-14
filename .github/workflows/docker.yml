@@ -198,36 +198,36 @@ jobs:
           tag_name: ${{ env.tags }}
           files: /opt/dk/*
 
- scp:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: 安装 sshpass
-        run: sudo apt-get install -y sshpass
-      - name: 下载
-        run: |
-          easytier=${{ env.tags }}
-          mkdir -p /opt/caddy/easytier/$easytier
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-386-docker.tar
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-aarch64-linux-musl.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-arm-linux-musleabi.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-arm-linux-musleabihf.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-arm64-docker.tar
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv5-docker.tar
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv7-docker.tar
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv7-linux-musleabi.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv7-linux-musleabihf.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-i686-linux-musl.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-mips-linux-muslsf.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-mipsel-linux-muslsf.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-x86_64-docker.tar
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-x86_64-linux-musl.tar.gz
-          wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-x86_64-freebsd.tar.gz
+ #scp:
+    #runs-on: ubuntu-latest
+    #needs: build
+    #steps:
+      #- name: 安装 sshpass
+        #run: sudo apt-get install -y sshpass
+      #- name: 下载
+        #run: |
+          #easytier=${{ env.tags }}
+          #mkdir -p /opt/caddy/easytier/$easytier
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-386-docker.tar
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-aarch64-linux-musl.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-arm-linux-musleabi.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-arm-linux-musleabihf.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-arm64-docker.tar
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv5-docker.tar
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv7-docker.tar
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv7-linux-musleabi.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-armv7-linux-musleabihf.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-i686-linux-musl.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-mips-linux-muslsf.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-mipsel-linux-muslsf.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-x86_64-docker.tar
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-x86_64-linux-musl.tar.gz
+          #wget -q -c -P /opt/caddy/easytier/$easytier https://github.com/lmq8267/EasyTier/releases/download/$easytier/easytier-x86_64-freebsd.tar.gz
           
-      - name: 连接SSH并复制文件
-        env:
+      #- name: 连接SSH并复制文件
+        #env:
           #读取帐号密码的环境变量
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          CMD: ${{ secrets.CMD }}
-        run: |
-          sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r /opt/caddy/* ${{ secrets.CMD }}
+          #SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          #CMD: ${{ secrets.CMD }}
+        #run: |
+          #sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r /opt/caddy/* ${{ secrets.CMD }}
