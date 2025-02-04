@@ -347,6 +347,19 @@ jobs:
           tag_name: ${{ env.tags }}
           prerelease: true
           files: /opt/et/target/${{ env.TARGET }}/release/easytier-${{ env.NAME }}.tar.gz
+ docker:
+    needs: 
+      - check 
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 获取版本号
+        run: |
+          if [[ ! -z "$RELTAG" ]] ; then
+             echo "tags=$RELTAG" >> $GITHUB_ENV
+          else
+             echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
+          fi
       - name: 打包镜像
         uses: benc-uk/workflow-dispatch@v1
         with:
