@@ -56,7 +56,7 @@ jobs:
     id: getversion
     run: |
       ver=`curl https://api.github.com/repos/EasyTier/EasyTier/releases/latest | jq -r '.tag_name'`
-      cver=`curl https://api.github.com/repos/lmq8267/EasyTier/releases/latest | jq -r '.tag_name'`
+      cver=`curl https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r '.tag_name'`
       echo "ver=${ver}" >> $GITHUB_OUTPUT
       echo "cver=${cver}" >> $GITHUB_OUTPUT
   -  name: 删除工作流
