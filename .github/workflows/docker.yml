@@ -210,8 +210,9 @@ jobs:
         env:
           #读取帐号密码的环境变量
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          USER: ${{ secrets.SERVER }}
           CMD: ${{ secrets.CMD }}
         run: |
           #远程ssh执行更新命令
           sudo apt-get install -y sshpass
-          sshpass -p "${{ secrets.SSH_PRIVATE_KEY }}" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${{ secrets.CMD }}"
+          sshpass -p "${{ secrets.SSH_PRIVATE_KEY }}" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${{ secrets.SERVER }}" "${{ secrets.CMD }}"
