@@ -239,7 +239,7 @@ jobs:
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
           else
-             echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
+             echo "tags=${{ needs.check.outputs.ver }}" >> $GITHUB_ENV
           fi
       - name: 优化磁盘空间
         if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
@@ -334,7 +334,7 @@ jobs:
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
           else
-             echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
+             echo "tags=${{ needs.check.outputs.ver }}" >> $GITHUB_ENV
           fi
           fi
           mkdir -p /opt/bin
@@ -394,7 +394,7 @@ jobs:
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
           else
-             echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
+             echo "tags=${{ needs.check.outputs.ver }}" >> $GITHUB_ENV
           fi
       - name: 打包镜像
         uses: benc-uk/workflow-dispatch@v1
