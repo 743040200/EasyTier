@@ -247,6 +247,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y qemu qemu-user-static binfmt-support build-essential
           cargo install cross --git https://github.com/cross-rs/cross
+          cross build --release --target x86_64-unknown-freebsd
+          find ~/.cargo -path "*x86_64-unknown-freebsd*/include"
           tagg=${{ env.BRANCHES }}
           [[ -z $tagg ]] && tagg=main
           git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
