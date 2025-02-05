@@ -225,6 +225,7 @@ jobs:
           sed -i '/prefix = concat!(env!("CARGO_PKG_VERSION"), "-"),/d' ./easytier/src/common/constants.rs
           sed -i '/suffix = "",/d' ./easytier/src/common/constants.rs
           sed -i 's/fallback = env!("CARGO_PKG_VERSION")/"CARGO_PKG_VERSION"/' ./easytier/src/common/constants.rs
+          export KCP_SYS_EXTRA_HEADER_PATH=/usr/include/musl-cross
           if [[ $TARGET =~ ^mips.*$ ]]; then
              cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --features mips
           else
