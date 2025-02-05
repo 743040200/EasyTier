@@ -111,7 +111,7 @@ jobs:
           - TARGET: x86_64-unknown-freebsd
             NAME: x86_64-freebsd
             
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       TARGET: ${{ matrix.TARGET }}
       URL: ${{ matrix.URL }}
@@ -243,27 +243,48 @@ jobs:
           fi
       - name: 编译FreeBSD
         if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu qemu-user-static binfmt-support build-essential
-          cargo install cross --git https://github.com/cross-rs/cross
-          cross build --release --target x86_64-unknown-freebsd
-          find ~/.cargo -path "*x86_64-unknown-freebsd*/include"
-          exi
-          tagg=${{ env.BRANCHES }}
-          [[ -z $tagg ]] && tagg=main
-          git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
-          cd /opt/et
-          #改成只使用中文帮助信息
-          sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' easytier/src/easytier-core.rs
-          sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-core.rs
-          sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-cli.rs
-          sed -i 's/git_version::git_version/env/' ./easytier/src/common/constants.rs
-          sed -i '/args = \["--abbrev=8", "--always", "--dirty=~"\],/d' ./easytier/src/common/constants.rs
-          sed -i '/prefix = concat!(env!("CARGO_PKG_VERSION"), "-"),/d' ./easytier/src/common/constants.rs
-          sed -i '/suffix = "",/d' ./easytier/src/common/constants.rs
-          sed -i 's/fallback = env!("CARGO_PKG_VERSION")/"CARGO_PKG_VERSION"/' ./easytier/src/common/constants.rs
-          cross build --release --target x86_64-unknown-freebsd
+        uses: cross-platform-actions/action@v0.23.0
+        with:
+          operating_system: freebsd
+          architecture: x86-64
+          version: '13.2'
+          shell: bash
+          memory: 5G
+          cpu_count: 4
+          run: |
+              sudo pkg install -y git protobuf llvm-devel
+              homedir=$(pwd)
+              sudo mkdir -p /opt
+              sudo chown -R $(whoami) /opt/
+              sudo rm -rf /tmp/*
+              tagg=${{ env.BRANCHES }}
+              [[ -z $tagg ]] && tagg=main
+              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+              source $HOME/.cargo/env
+              rustup set auto-self-update disable
+              rustup install 1.84
+              rustup default 1.84
+              echo "编译版本：$tagg"
+              git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
+              cd /opt/et
+              #改成只使用中文帮助信息
+              sed -i '' 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' easytier/src/easytier-core.rs
+              sed -i '' 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-core.rs
+              sed -i '' 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-cli.rs
+              sed -i '' 's/git_version::git_version/env/' ./easytier/src/common/constants.rs
+              sed -i '' '/args = \["--abbrev=8", "--always", "--dirty=~"\],/d' ./easytier/src/common/constants.rs
+              sed -i '' '/prefix = concat!(env!("CARGO_PKG_VERSION"), "-"),/d' ./easytier/src/common/constants.rs
+              sed -i '' '/suffix = "",/d' ./easytier/src/common/constants.rs
+              sed -i '' 's/fallback = env!("CARGO_PKG_VERSION")/"CARGO_PKG_VERSION"/' ./easytier/src/common/constants.rs
+              export CC=clang
+              export CXX=clang++
+              export CARGO_TERM_COLOR=always
+              export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
+              cargo build --release --target x86_64-unknown-freebsd
+              ./target/${{ env.TARGET }}/release/easytier-core -h
+              mv -f target/${{ env.TARGET }}/release/easytier-core ${homedir}/easytier-core
+              mv -f target/${{ env.TARGET }}/release/easytier-cli ${homedir}/easytier-cli
+              mv -f target/${{ env.TARGET }}/release/easytier-web ${homedir}/easytier-web
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
         run: |
@@ -272,6 +293,18 @@ jobs:
           upx --lzma --best /opt/et/target/${{ env.TARGET }}/release/easytier-web
       - name: 打包
         run: |
+          if [[ $TARGET == 'x86_64-unknown-freebsd' ]]; then
+          mkdir -p /opt/et/target/${{ env.TARGET }}/release
+          mv -f ./easytier-core /opt/et/target/${{ env.TARGET }}/release/easytier-core
+          mv -f ./easytier-cli /opt/et/target/${{ env.TARGET }}/release/easytier-cli
+          mv -f ./easytier-web /opt/et/target/${{ env.TARGET }}/release/easytier-web
+          echo "build_time=$(TZ=UTC-8 date +%Y-%m-%d' '%H:%M:%S)" >> $GITHUB_ENV
+          if [[ ! -z "$RELTAG" ]] ; then
+             echo "tags=$RELTAG" >> $GITHUB_ENV
+          else
+             echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
+          fi
+          fi
           mkdir -p /opt/bin
           cd /opt/et/target/${{ env.TARGET }}/release
           file easytier-core
