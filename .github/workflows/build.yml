@@ -111,7 +111,7 @@ jobs:
           - TARGET: x86_64-unknown-freebsd
             NAME: x86_64-freebsd
             
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       TARGET: ${{ matrix.TARGET }}
       URL: ${{ matrix.URL }}
@@ -125,13 +125,14 @@ jobs:
         run: |
           mkdir -p /opt/musl_gcc
           rustup set auto-self-update disable
-          rustup install 1.77
-          rustup default 1.77
+          rustup install 1.84
+          rustup default 1.84
           
           wget -q -c https://musl.cc/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
           tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
-          sudo ln -s /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
-          sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools
+          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
+          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/include/ /usr/include/musl-cross
+          sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools libappindicator3-dev llvm clang
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
             cp libgcc_eh.a libunwind.a
@@ -250,7 +251,7 @@ jobs:
           memory: 5G
           cpu_count: 4
           run: |
-              sudo pkg install -y git protobuf
+              sudo pkg install -y git protobuf llvm-devel
               homedir=$(pwd)
               sudo mkdir -p /opt
               sudo chown -R $(whoami) /opt/
@@ -259,8 +260,8 @@ jobs:
               curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
               source $HOME/.cargo/env
               rustup set auto-self-update disable
-              rustup install 1.77
-              rustup default 1.77
+              rustup install 1.84
+              rustup default 1.84
               git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
               cd /opt/et
               #改成只使用中文帮助信息
