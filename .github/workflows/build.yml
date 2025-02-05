@@ -111,7 +111,7 @@ jobs:
           - TARGET: x86_64-unknown-freebsd
             NAME: x86_64-freebsd
             
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       TARGET: ${{ matrix.TARGET }}
       URL: ${{ matrix.URL }}
