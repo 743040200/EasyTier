@@ -278,7 +278,7 @@ jobs:
               export CC=clang
               export CXX=clang++
               export CARGO_TERM_COLOR=always
-              export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
+              #export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
               cargo build --release --target x86_64-unknown-freebsd
               ./target/${{ env.TARGET }}/release/easytier-core -h
               mv -f target/${{ env.TARGET }}/release/easytier-core ${homedir}/easytier-core
