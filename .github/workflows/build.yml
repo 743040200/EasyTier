@@ -263,6 +263,7 @@ jobs:
               rustup set auto-self-update disable
               rustup install 1.84
               rustup default 1.84
+              echo "编译版本：$tagg"
               git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
               cd /opt/et
               #改成只使用中文帮助信息
