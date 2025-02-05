@@ -241,6 +241,38 @@ jobs:
           else
              echo "tags=${{ needs.check.outputs.ver }}-$(date '+%Y%m%d')" >> $GITHUB_ENV
           fi
+      - name: 优化磁盘空间
+        if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
+        uses: "hugoalh/disk-space-optimizer-ghaction@v0.8.1"
+        with:
+          operate_sudo: "True"
+          general_include: ".+"
+          general_exclude: |-
+            ^GCC$
+            ^G\+\+$
+            Clang
+            LLVM
+          docker_include: ".+"
+          docker_prune: "True"
+          docker_clean: "True"
+          apt_prune: "True"
+          apt_clean: "True"
+          homebrew_prune: "True"
+          homebrew_clean: "True"
+          npm_prune: "True"
+          npm_clean: "True"
+          os_swap: "True"
+      - name: 释放磁盘空间
+        if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
+        uses: easimon/maximize-build-space@master
+        with: 
+          root-reserve-mb: 10240
+          swap-size-mb: 1
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
       - name: 编译FreeBSD
         if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
         uses: cross-platform-actions/action@v0.23.0
