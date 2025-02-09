@@ -116,7 +116,7 @@ jobs:
           echo "RUN echo 'cd /app' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'cp -rf /usr/bin/easytier-web /app/easytier-web' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'cp -rf /usr/bin/dist /app/dist' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo 'exec ./easytier-web ' >> /usr/bin/easytier.sh" >> ./Dockerfile
+          echo "RUN echo 'exec ./easytier-web \"\$@\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'else' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '  echo \"Docker环境变量 WEB=1 未设置，默认运行 /usr/bin/easytier-core\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'exec \"\$APP_EXEC\" \"\$@\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
