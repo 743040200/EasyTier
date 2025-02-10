@@ -134,6 +134,7 @@ jobs:
           echo "EXPOSE 11211/tcp" >> ./Dockerfile
           echo "EXPOSE 8080/tcp" >> ./Dockerfile
           echo "VOLUME /app" >> ./Dockerfile
+          echo "VOLUME /etc/machine-id" >> ./Dockerfile
           echo "ENTRYPOINT [\"/usr/bin/easytier.sh\"]" >> ./Dockerfile
           
       - name: Setup QEMU
