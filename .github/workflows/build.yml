@@ -369,8 +369,7 @@ jobs:
               cargo clean
               cargo build --release --target x86_64-unknown-freebsd --package=easytier-web --features=embed
               etbin/easytier-core -h
-              rm -rf ${homedir}/easytier-web || true
-              mv -f target/${{ env.TARGET }}/release/easytier-web ${homedir}/easytier-web
+              mv -f target/${{ env.TARGET }}/release/easytier-web ${homedir}/easytier-web/easytier-web
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
         run: |
@@ -383,7 +382,7 @@ jobs:
           mkdir -p /opt/et/target/${{ env.TARGET }}/release
           mv -f ./easytier-core /opt/et/target/${{ env.TARGET }}/release/easytier-core
           mv -f ./easytier-cli /opt/et/target/${{ env.TARGET }}/release/easytier-cli
-          mv -f ./easytier-web /opt/et/target/${{ env.TARGET }}/release/easytier-web
+          mv -f ./easytier-web/easytier-web /opt/et/target/${{ env.TARGET }}/release/easytier-web
           echo "build_time=$(TZ=UTC-8 date '+%Y年%m月%d日%H:%M:%S' | jq -sRr @uri)" >> $GITHUB_ENV
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
