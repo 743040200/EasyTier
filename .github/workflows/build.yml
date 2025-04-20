@@ -316,6 +316,11 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
           remove-docker-images: 'true'
+      - name: 下载静态页面
+        uses: actions/download-artifact@v4
+        with:
+          name: easytier-web-dashboard
+          path: easytier-web/frontend/dist/
       - name: 编译FreeBSD
         if: ${{ matrix.TARGET == 'x86_64-unknown-freebsd' }}
         uses: cross-platform-actions/action@v0.23.0
@@ -341,7 +346,8 @@ jobs:
               rustup default 1.84
               echo "编译版本：$tagg"
               git clone -b $tagg https://github.com/EasyTier/EasyTier /tmp/et
-              cp -rf easytier-web/frontend/dist /tmp/et/easytier-web/frontend/dist
+              ls
+              cp -rf ./easytier-web/frontend/dist /tmp/et/easytier-web/frontend/dist
               cd /tmp/et
               #改成只使用中文帮助信息
               sed -i '' 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' easytier/src/easytier-core.rs
