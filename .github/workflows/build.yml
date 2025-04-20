@@ -363,10 +363,14 @@ jobs:
               export CARGO_TERM_COLOR=always
               export RUSTFLAGS="-C opt-level=z -C target-cpu=native -C link-arg=-s"
               cargo build --release --target x86_64-unknown-freebsd --package=easytier
+              mkdir -p etbin
+              mv -f target/${{ env.TARGET }}/release/easytier-core etbin/easytier-core
+              mv -f target/${{ env.TARGET }}/release/easytier-cli etbin/easytier-cli
+              cargo clean
               cargo build --release --target x86_64-unknown-freebsd --package=easytier-web --features=embed
               ./target/${{ env.TARGET }}/release/easytier-core -h
-              mv -f target/${{ env.TARGET }}/release/easytier-core ${homedir}/easytier-core
-              mv -f target/${{ env.TARGET }}/release/easytier-cli ${homedir}/easytier-cli
+              mv -f etbin/easytier-core ${homedir}/easytier-core
+              mv -f etbin/easytier-cli ${homedir}/easytier-cli
               mv -f target/${{ env.TARGET }}/release/easytier-web ${homedir}/easytier-web
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
