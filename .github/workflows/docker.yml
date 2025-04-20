@@ -29,22 +29,6 @@ jobs:
  build:
     runs-on: ubuntu-latest
     steps:
-      - name: 设置Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '21' # 使用的 Node.js 版本，可调整
-      - name: 安装pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-          run_install: false
-      - name: 构建 HTML
-        run: |
-          git clone https://github.com/EasyTier/EasyTier /opt/et
-          cd /opt/et
-          pnpm -r install
-          pnpm -r build
-          cp -rf /opt/et/easytier-web/frontend/dist /opt/dist
       - name: 下载程序
         run: |
           cd /opt
@@ -88,9 +72,7 @@ jobs:
           echo "FROM alpine:latest" > ./Dockerfile
           echo "ARG TARGETARCH" >> ./Dockerfile
           echo "ARG TARGETVARIANT" >> ./Dockerfile
-          echo "RUN apk add --no-cache tzdata caddy" >> ./Dockerfile
-          echo "RUN mkdir -p /app" >> ./Dockerfile
-          echo "COPY dist /usr/bin/dist" >> ./Dockerfile
+          echo "RUN apk add --no-cache tzdata" >> ./Dockerfile
           echo "ADD easytier-core_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-core" >> ./Dockerfile
           echo "ADD easytier-cli_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-cli" >> ./Dockerfile
           echo "ADD easytier-web_\$TARGETARCH\$TARGETVARIANT /usr/bin/easytier-web" >> ./Dockerfile 
@@ -111,13 +93,8 @@ jobs:
           echo "RUN echo '' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '# 判断环境变量 WEB 的值' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'if [ \"\$WEB\" = \"1\" ]; then' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo '  echo \"Docker环境变量 WEB=1 已设置，运行 /usr/bin/easytier-web\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo ' caddy file-server --listen :8080 --root /app/dist &' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo '  echo \"运行caddy 静态网页， 请映射8080端口\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo 'cd /app' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo 'cp -rf /usr/bin/easytier-web /app/easytier-web' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo 'cp -rf /usr/bin/dist /app/dist' >> /usr/bin/easytier.sh" >> ./Dockerfile
-          echo "RUN echo 'exec ./easytier-web \"\$@\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
+          echo "RUN echo '  echo \"Docker环境变量 WEB=1 已设置，运行 /usr/bin/easytier-web 请使用-d参数指定数据库目录，并且挂载数据库目录防止数据丢失！\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
+          echo "RUN echo 'exec /usr/bin/easytier-web \"\$@\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'else' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo '  echo \"Docker环境变量 WEB=1 未设置，默认运行 /usr/bin/easytier-core\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
           echo "RUN echo 'exec \"\$APP_EXEC\" \"\$@\"' >> /usr/bin/easytier.sh" >> ./Dockerfile
@@ -133,9 +110,9 @@ jobs:
           echo "EXPOSE 11012/tcp" >> ./Dockerfile
           echo "EXPOSE 22020/udp" >> ./Dockerfile
           echo "EXPOSE 11211/tcp" >> ./Dockerfile
-          echo "EXPOSE 8080/tcp" >> ./Dockerfile
-          echo "VOLUME /app" >> ./Dockerfile
-          echo "VOLUME /etc/machine-id" >> ./Dockerfile
+          echo "EXPOSE 11210/tcp" >> ./Dockerfile
+          echo "VOLUME /usr/bin/et_machine_id" >> ./Dockerfile
+          echo "VOLUME /var/lib/dbus/machine-id" >> ./Dockerfile
           echo "ENTRYPOINT [\"/usr/bin/easytier.sh\"]" >> ./Dockerfile
           
       - name: Setup QEMU
@@ -214,18 +191,18 @@ jobs:
           tag_name: ${{ env.tags }}
           files: /opt/dk/*
 
- scp:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: 更新服务器
-        if: github.repository_owner == 'lmq8267' # 判断仓库所有者是否是 lmq8267 才执行
-        env:
+ #scp:
+    #runs-on: ubuntu-latest
+    #needs: build
+    #steps:
+      #- name: 更新服务器
+        #if: github.repository_owner == 'lmq8267' # 判断仓库所有者是否是 lmq8267 才执行
+        #env:
           #读取帐号密码的环境变量
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          USER: ${{ secrets.SERVER }}
-          CMD: ${{ secrets.CMD }}
-        run: |
+          #SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          #USER: ${{ secrets.SERVER }}
+          #CMD: ${{ secrets.CMD }}
+        #run: |
           #远程ssh执行更新命令
-          sudo apt-get install -y sshpass
-          sshpass -p "${{ secrets.SSH_PRIVATE_KEY }}" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${{ secrets.SERVER }}" "${{ secrets.CMD }}"
+          #sudo apt-get install -y sshpass
+          #sshpass -p "${{ secrets.SSH_PRIVATE_KEY }}" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${{ secrets.SERVER }}" "${{ secrets.CMD }}"
