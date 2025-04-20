@@ -371,6 +371,7 @@ jobs:
               etbin/easytier-core -h
               mv -f etbin/easytier-core ${homedir}/easytier-core
               mv -f etbin/easytier-cli ${homedir}/easytier-cli
+              rm -rf ${homedir}/easytier-web || true
               mv -f target/${{ env.TARGET }}/release/easytier-web ${homedir}/easytier-web
       - name: 压缩
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' && github.event.inputs.upx != 'false' }}
