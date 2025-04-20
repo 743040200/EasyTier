@@ -368,7 +368,7 @@ jobs:
               mv -f target/${{ env.TARGET }}/release/easytier-cli etbin/easytier-cli
               cargo clean
               cargo build --release --target x86_64-unknown-freebsd --package=easytier-web --features=embed
-              ./target/${{ env.TARGET }}/release/easytier-core -h
+              etbin/easytier-core -h
               mv -f etbin/easytier-core ${homedir}/easytier-core
               mv -f etbin/easytier-cli ${homedir}/easytier-cli
               mv -f target/${{ env.TARGET }}/release/easytier-web ${homedir}/easytier-web
