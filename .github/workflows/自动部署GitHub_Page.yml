@@ -66,6 +66,9 @@ jobs:
       - name: 构建 HTML
         run: |
           cd /opt/et
+          sed -i 's|^// import { viteSingleFile }|import { viteSingleFile }|' easytier-web/frontend/vite.config.ts
+          sed -i 's|vue(),/\* viteSingleFile() \*/|vue(), viteSingleFile()|' easytier-web/frontend/vite.config.ts
+          cat easytier-web/frontend/vite.config.ts
           pnpm -r install
           pnpm -r build
       - name: 上传到文件服务器
