@@ -477,9 +477,9 @@ jobs:
           CURRENT_TIMESTAMP=$(date +%s)
           DIFF_DAYS=$(( (CURRENT_TIMESTAMP - LAST_COMMIT_TIMESTAMP) / 86400 ))
           echo "距离上次提交以来的天数: $DIFF_DAYS"
-          echo "::set-output name=diff_days::$DIFF_DAYS"
+          echo "diff_days=$DIFF_DAYS" >> $GITHUB_ENV
       - name: 执行空提交
-        if: ${{ steps.check_commit_date.outputs.diff_days > 50 }}
+        if: ${{ env.diff_days > 50 }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
