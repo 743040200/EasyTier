@@ -165,7 +165,7 @@ jobs:
           rustup install 1.84
           rustup default 1.84
           
-          wget -q -c https://musl.cc/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
+          wget -q -c https://github.com/lmq8267/Toolchain/releases/download/musl-cross/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
           tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
           sudo ln -s /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
           sudo ln -s /opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include/ /usr/include/musl-cross
