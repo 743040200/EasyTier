@@ -169,12 +169,12 @@ jobs:
           rustup set auto-self-update disable
           rustup install 1.86
           rustup default 1.86
-          
+          MUSL_TARGET=$TARGET
           sudo apt-get update && sudo apt-get install -qq musl-tools libappindicator3-dev llvm clang
           if [[ $TARGET =~ ^mips.*$ || $TARGET =~ ^mipsel.*$ ]]; then
             MUSL_TARGET=${TARGET}sf
           fi
-          wget --inet4-only -c https://github.com/cross-tools/musl-cross/releases/download/20250520/${MUSL_TARGET}.tar.xz -P /opt/musl_gcc/
+          wget -q --inet4-only -c https://github.com/cross-tools/musl-cross/releases/download/20250520/${MUSL_TARGET}.tar.xz -P /opt/musl_gcc/
           tar xf /opt/musl_gcc/${MUSL_TARGET}.tar.xz -C /opt/musl_gcc/
           sudo ln -sf /opt/musl_gcc/${MUSL_TARGET}/bin/*gcc /usr/bin/
           sudo ln -sf /opt/musl_gcc/${MUSL_TARGET}/include/ /usr/include/musl-cross
