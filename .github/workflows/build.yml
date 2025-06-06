@@ -177,7 +177,7 @@ jobs:
           rustup install 1.86
           rustup default 1.86
           
-          sudo apt-get update && sudo apt-get install -qq libappindicator3-dev llvm clang
+          sudo apt-get update && sudo apt-get install -qq musl-tools libappindicator3-dev llvm clang
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
             cp libgcc_eh.a libunwind.a
@@ -277,10 +277,10 @@ jobs:
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
           export KCP_SYS_EXTRA_HEADER_PATH=/opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             RING_DISABLE_ASM=1 cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
+             cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
              cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
           else
-             RING_DISABLE_ASM=1 cargo build --release -v --target ${{ env.TARGET }} --package=easytier
+             cargo build --release -v --target ${{ env.TARGET }} --package=easytier
              cargo build --release -v --target ${{ env.TARGET }} --package=easytier-web --features=embed
           fi
           
