@@ -169,6 +169,8 @@ jobs:
           tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
           sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
           sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include/ /usr/include/musl-cross
+          ${{ env.URL }}-gcc -v || true
+          which ${{ env.URL }}-gcc
           sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools libappindicator3-dev llvm clang
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
