@@ -178,6 +178,7 @@ jobs:
           rustup default 1.86
           
           sudo apt-get update && sudo apt-get install -qq musl-tools libappindicator3-dev llvm clang
+          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
             cp libgcc_eh.a libunwind.a
@@ -275,15 +276,15 @@ jobs:
           sed -i '/suffix = "",/d' ./easytier/src/common/constants.rs
           sed -i 's/fallback = env!("CARGO_PKG_VERSION")/"CARGO_PKG_VERSION"/' ./easytier/src/common/constants.rs
 
-          #sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier-web/src/main.rs
-          #sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
+          sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier-web/src/main.rs
+          sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
           export KCP_SYS_EXTRA_HEADER_PATH=/opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include
           if [[ $TARGET =~ ^mips.*$ ]]; then
              cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --package=easytier-web --features=embed
-             cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --no-default-features --features mips
+             cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --package=easytier ---no-default-features --features mips
           else
             cargo build --release -v --target $TARGET --package=easytier-web --features=embed
-            cargo build --release -v --target $TARGET
+            cargo build --release -v --target $TARGET --package=easytier
           fi
           
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
