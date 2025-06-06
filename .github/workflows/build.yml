@@ -164,13 +164,6 @@ jobs:
           
       - name: 下载编译工具
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
-        uses: lmq8267/dl-musl@main
-        with:
-          target: ${{ env.URL }}
-          gccpath: /opt/musl_gcc
-          
-      - name: 下载编译工具
-        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: |
           mkdir -p /opt/musl_gcc
           rustup set auto-self-update disable
@@ -178,9 +171,17 @@ jobs:
           rustup default 1.86
           
           sudo apt-get update && sudo apt-get install -qq musl-tools libappindicator3-dev llvm clang
-          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
+          if [[ $TARGET =~ ^mips.*$ || $TARGET =~ ^mipsel.*$ ]]; then
+            MUSL_TARGET=${TARGET}sf
+          fi
+          wget --inet4-only -c https://github.com/cross-tools/musl-cross/releases/download/20250520/${MUSL_TARGET}.tar.xz -P /opt/musl_gcc/
+          tar xf /opt/musl_gcc/${MUSL_TARGET}.tar.xz -C /opt/musl_gcc/
+          sudo ln -sf /opt/musl_gcc/${MUSL_TARGET}/bin/*gcc /usr/bin/
+          sudo ln -sf /opt/musl_gcc/${MUSL_TARGET}/include/ /usr/include/musl-cross
+          sudo ln -sf /opt/musl_gcc/${MUSL_TARGET}/${MUSL_TARGET}/sysroot/ /opt/musl_gcc/sysroot
+          sudo chmod -R a+rwx /opt/musl_gcc
           if [[ $TARGET =~ ^mips.*$ ]]; then
-            cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
+            cd "/opt/musl_gcc/${MUSL_TARGET}/lib/gcc/${MUSL_TARGET}/15.1.0" || exit 255
             cp libgcc_eh.a libunwind.a
             ar x libgcc.a _ctzsi2.o _clz.o _bswapsi2.o
             ar rcs libctz.a _ctzsi2.o _clz.o _bswapsi2.o
@@ -215,53 +216,59 @@ jobs:
           #添加交叉编译配置
           cat >>.cargo/config.toml <<EOF
           [target.x86_64-unknown-linux-musl]
-          linker = "/opt/musl_gcc/x86_64-linux-musl-cross/bin/x86_64-linux-musl-gcc"
+          linker = "/opt/musl_gcc/x86_64-unknown-linux-musl/bin/x86_64-unknown-linux-musl-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
           
           [target.i686-unknown-linux-musl]
-          linker = "/opt/musl_gcc/i686-linux-musl-cross/bin/i686-linux-musl-gcc"
+          linker = "/opt/musl_gcc/i686-unknown-linux-musl/bin/i686-unknown-linux-musl-gcc"
           rustflags = ["-C", "target-feature=+crt-static"] 
           
           [target.aarch64-unknown-linux-musl]
-          linker = "/opt/musl_gcc/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc"
+          linker = "/opt/musl_gcc/aarch64-unknown-linux-musl/bin/aarch64-unknown-linux-musl-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
           
           [target.armv7-unknown-linux-musleabi]
-          linker = "/opt/musl_gcc/armv7m-linux-musleabi-cross/bin/armv7m-linux-musleabi-gcc"
+          linker = "/opt/musl_gcc/armv7-unknown-linux-musleabi/bin/armv7-unknown-linux-musleabi-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
 
           [target.armv7-unknown-linux-musleabihf]
-          linker = "/opt/musl_gcc/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-gcc"
+          linker = "/opt/musl_gcc/armv7-unknown-linux-musleabihf/bin/armv7-unknown-linux-musleabihf-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
           
           [target.arm-unknown-linux-musleabi]
-          linker = "/opt/musl_gcc/arm-linux-musleabi-cross/bin/arm-linux-musleabi-gcc"
+          linker = "/opt/musl_gcc/arm-unknown-linux-musleabi/bin/arm-unknown-linux-musleabi-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
-          "-L", "/opt/musl_gcc/arm-linux-musleabi-cross/arm-linux-musleabi/lib",
-          "-L", "/opt/musl_gcc/arm-linux-musleabi-cross/lib/gcc/arm-linux-musleabi/11.2.1",
-          "-l", "atomic"]
+          "-L", "/opt/musl_gcc/arm-unknown-linux-musleabi/arm-linux-musleabi/lib",
+          "-L", "/opt/musl_gcc/arm-unknown-linux-musleabi/arm-linux-unknown-musleabi/sysroot/usr/lib",
+          "-L", "/opt/musl_gcc/arm-unknown-linux-musleabi/lib/gcc/arm-unknown-linux-musleabi/15.1.0",
+          "-l", "atomic",
+          "-l", "gcc"]
 
           [target.arm-unknown-linux-musleabihf]
-          linker = "/opt/musl_gcc/arm-linux-musleabihf-cross/bin/arm-linux-musleabihf-gcc"
+          linker = "/opt/musl_gcc/arm-unknown-linux-musleabihf/bin/arm-unknown-linux-musleabihf-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
-          "-L", "/opt/musl_gcc/arm-linux-musleabihf-cross/arm-linux-musleabihf/lib",
-          "-L", "/opt/musl_gcc/arm-linux-musleabihf-cross/lib/gcc/arm-linux-musleabihf/11.2.1",
-          "-l", "atomic"]
+          "-L", "/opt/musl_gcc/arm-unknown-linux-musleabihf/arm-linux-musleabihf/lib",
+          "-L", "/opt/musl_gcc/arm-unknown-linux-musleabihf/arm-unknown-linux-musleabihf/sysroot/usr/lib",
+          "-L", "/opt/musl_gcc/arm-unknown-linux-musleabihf/lib/gcc/arm-unknown-linux-musleabihf/15.1.0",
+          "-l", "atomic",
+          "-l", "gcc"]
           
           [target.mipsel-unknown-linux-musl]
-          linker = "/opt/musl_gcc/mipsel-linux-muslsf-cross/bin/mipsel-linux-muslsf-gcc"
+          linker = "/opt/musl_gcc/mipsel-unknown-linux-muslsf/bin/mipsel-unknown-linux-muslsf-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
-          "-L", "/opt/musl_gcc/mipsel-linux-muslsf-cross/mipsel-linux-muslsf/lib",
-          "-L", "/opt/musl_gcc/mipsel-linux-muslsf-cross/lib/gcc/mipsel-linux-muslsf/11.2.1",
+          "-L", "/opt/musl_gcc/mipsel-unknown-linux-muslsf/mipsel-linux-muslsf/lib",
+          "-L", "/opt/musl_gcc/mipsel-unknown-linux-muslsf/mipsel-unknown-linux-muslsf/sysroot/usr/lib",
+          "-L", "/opt/musl_gcc/mipsel-unknown-linux-muslsf/lib/gcc/mipsel-unknown-linux-muslsf/15.1.0",
           "-l", "atomic",
           "-l", "ctz",
           "-l", "gcc"]
           
           [target.mips-unknown-linux-musl]
-          linker = "/opt/musl_gcc/mips-linux-muslsf-cross/bin/mips-linux-muslsf-gcc"
+          linker = "/opt/musl_gcc/mips-unknown-linux-muslsf/bin/mips-unknown-linux-muslsf-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
-          "-L", "/opt/musl_gcc/mips-linux-muslsf-cross/mips-linux-muslsf/lib",
-          "-L", "/opt/musl_gcc/mips-linux-muslsf-cross/lib/gcc/mips-linux-muslsf/11.2.1",
+          "-L", "/opt/musl_gcc/mips-unknown-linux-muslsf/mips-unknown-linux-muslsf/lib",
+          "-L", "/opt/musl_gcc/mips-unknown-linux-muslsf/mips-unknown-linux-muslsf/sysroot/usr/lib",
+          "-L", "/opt/musl_gcc/mips-unknown-linux-muslsf/lib/gcc/mips-unknown-linux-muslsf/15.1.0",
           "-l", "atomic",
           "-l", "ctz",
           "-l", "gcc"]      
@@ -278,7 +285,9 @@ jobs:
 
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier-web/src/main.rs
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
-          export KCP_SYS_EXTRA_HEADER_PATH=/opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include
+          if [[ -d "/opt/musl_gcc/sysroot" ]]; then
+            export BINDGEN_EXTRA_CLANG_ARGS=--sysroot=$(readlink -f /opt/musl_gcc/sysroot)
+          fi
           if [[ $TARGET =~ ^mips.*$ ]]; then
              cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --package=easytier-web --features=embed
              cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --package=easytier ---no-default-features --features mips
@@ -286,10 +295,12 @@ jobs:
             cargo build --release -v --target $TARGET --package=easytier-web --features=embed
             cargo build --release -v --target $TARGET --package=easytier
           fi
-          
-          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
-          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-cli
-          /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-web
+          if [[ $TARGET =~ ^mips.*$ || $TARGET =~ ^mipsel.*$ ]]; then
+            MUSL_TARGET=${TARGET}sf
+          fi
+          /opt/musl_gcc/${MUSL_TARGET}/bin/${MUSL_TARGET}-strip ./target/${{ env.TARGET }}/release/easytier-core
+          /opt/musl_gcc/${MUSL_TARGET}/bin/${MUSL_TARGET}-strip ./target/${{ env.TARGET }}/release/easytier-cli
+          /opt/musl_gcc/${MUSL_TARGET}/bin/${MUSL_TARGET}-strip ./target/${{ env.TARGET }}/release/easytier-web
           echo "build_time=$(TZ=UTC-8 date '+%Y年%m月%d日%H:%M:%S' | jq -sRr @uri)" >> $GITHUB_ENV
           if [[ ! -z "$RELTAG" ]] ; then
              echo "tags=$RELTAG" >> $GITHUB_ENV
