@@ -33,35 +33,35 @@ jobs:
         run: |
           cd /opt
           
-          curl -o /opt/easytier.tar.gz -L https://github.com/${{ github.repository }}/releases/download/$tags/easytier-aarch64-linux-musl.tar.gz
+          curl -Lko /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-aarch64-linux-musl.tar.gz || wget -O /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-aarch64-linux-musl.tar.gz
           tar -xzvf /opt/easytier.tar.gz -C /opt/
           rm -rf easytier.tar.gz
           mv -f easytier-core easytier-core_arm64
           mv -f easytier-cli easytier-cli_arm64
           mv -f easytier-web easytier-web_arm64
 
-          curl -o /opt/easytier.tar.gz -L https://github.com/${{ github.repository }}/releases/download/$tags/easytier-x86_64-linux-musl.tar.gz
+          curl -Lko /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-x86_64-linux-musl.tar.gz || wget -O /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-x86_64-linux-musl.tar.gz
           tar -xzvf /opt/easytier.tar.gz -C /opt/
           rm -rf easytier.tar.gz
           mv -f easytier-core easytier-core_amd64
           mv -f easytier-cli easytier-cli_amd64
           mv -f easytier-web easytier-web_amd64
 
-          curl -o /opt/easytier.tar.gz -L https://github.com/${{ github.repository }}/releases/download/$tags/easytier-i686-linux-musl.tar.gz
+          curl -Lko /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-i686-linux-musl.tar.gz || wget -O /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-i686-linux-musl.tar.gz
           tar -xzvf /opt/easytier.tar.gz -C /opt/
           rm -rf easytier.tar.gz
           mv -f easytier-core easytier-core_386
           mv -f easytier-cli easytier-cli_386
           mv -f easytier-web easytier-web_386
 
-          curl -o /opt/easytier.tar.gz -L https://github.com/${{ github.repository }}/releases/download/$tags/easytier-armv7-linux-musleabi.tar.gz
+          curl -Lko /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-armv7-linux-musleabi.tar.gz || wget -O /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-armv7-linux-musleabi.tar.gz
           tar -xzvf /opt/easytier.tar.gz -C /opt/
           rm -rf easytier.tar.gz
           mv -f easytier-core easytier-core_armv7
           mv -f easytier-cli easytier-cli_armv7
           mv -f easytier-web easytier-web_armv7
 
-          curl -o /opt/easytier.tar.gz -L https://github.com/${{ github.repository }}/releases/download/$tags/easytier-arm-linux-musleabi.tar.gz
+          curl -Lko /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-arm-linux-musleabi.tar.gz || wget -O /opt/easytier.tar.gz https://github.com/${{ github.repository }}/releases/download/$tags/easytier-arm-linux-musleabi.tar.gz
           tar -xzvf /opt/easytier.tar.gz -C /opt/
           rm -rf easytier.tar.gz
           mv -f easytier-core easytier-core_armv6
