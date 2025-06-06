@@ -276,6 +276,7 @@ jobs:
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier-web/src/main.rs
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
           export KCP_SYS_EXTRA_HEADER_PATH=/opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include
+          export RING_DISABLE_ASM=yes
           if [[ $TARGET =~ ^mips.*$ ]]; then
              cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
              cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
