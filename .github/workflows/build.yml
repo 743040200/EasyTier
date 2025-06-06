@@ -199,41 +199,41 @@ jobs:
           #添加交叉编译配置
           cat >>~/.cargo/config <<EOF
           [target.x86_64-unknown-linux-musl]
-          linker = "rust-lld"
-          rustflags = ["-C", "linker-flavor=ld.lld"]
+          linker = "/opt/musl_gcc/x86_64-linux-musl-cross/bin/x86_64-linux-musl-gcc"
+          rustflags = ["-C", "target-feature=+crt-static"]
           
           [target.i686-unknown-linux-musl]
-          linker = "i686-linux-musl-gcc"
+          linker = "/opt/musl_gcc/i686-linux-musl-cross/bin/i686-linux-musl-gcc"
           rustflags = ["-C", "target-feature=+crt-static"] 
           
           [target.aarch64-unknown-linux-musl]
-          linker = "aarch64-linux-musl-gcc"
+          linker = "/opt/musl_gcc/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
           
           [target.armv7-unknown-linux-musleabi]
-          linker = "armv7m-linux-musleabi-gcc"
+          linker = "/opt/musl_gcc/armv7m-linux-musleabi-cross/bin/armv7m-linux-musleabi-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
 
           [target.armv7-unknown-linux-musleabihf]
-          linker = "armv7l-linux-musleabihf-gcc"
+          linker = "/opt/musl_gcc/armv7l-linux-musleabihf-cross/bin/armv7l-linux-musleabihf-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
           
           [target.arm-unknown-linux-musleabi]
-          linker = "arm-linux-musleabi-gcc"
+          linker = "/opt/musl_gcc/arm-linux-musleabi-cross/bin/arm-linux-musleabi-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
           "-L", "/opt/musl_gcc/arm-linux-musleabi-cross/arm-linux-musleabi/lib",
           "-L", "/opt/musl_gcc/arm-linux-musleabi-cross/lib/gcc/arm-linux-musleabi/11.2.1",
           "-l", "atomic"]
 
           [target.arm-unknown-linux-musleabihf]
-          linker = "arm-linux-musleabihf-gcc"
+          linker = "/opt/musl_gcc/arm-linux-musleabihf-cross/bin/arm-linux-musleabihf-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
           "-L", "/opt/musl_gcc/arm-linux-musleabihf-cross/arm-linux-musleabihf/lib",
           "-L", "/opt/musl_gcc/arm-linux-musleabihf-cross/lib/gcc/arm-linux-musleabihf/11.2.1",
           "-l", "atomic"]
           
           [target.mipsel-unknown-linux-musl]
-          linker = "mipsel-linux-muslsf-gcc"
+          linker = "/opt/musl_gcc/mipsel-linux-muslsf-cross/bin/mipsel-linux-muslsf-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
           "-L", "/opt/musl_gcc/mipsel-linux-muslsf-cross/mipsel-linux-muslsf/lib",
           "-L", "/opt/musl_gcc/mipsel-linux-muslsf-cross/lib/gcc/mipsel-linux-muslsf/11.2.1",
@@ -241,7 +241,7 @@ jobs:
           "-l", "ctz"]
           
           [target.mips-unknown-linux-musl]
-          linker = "mips-linux-muslsf-gcc"
+          linker = "/opt/musl_gcc/mips-linux-muslsf-cross/bin/mips-linux-muslsf-gcc"
           rustflags = ["-C", "target-feature=+crt-static",
           "-L", "/opt/musl_gcc/mips-linux-muslsf-cross/mips-linux-muslsf/lib",
           "-L", "/opt/musl_gcc/mips-linux-muslsf-cross/lib/gcc/mips-linux-muslsf/11.2.1",
