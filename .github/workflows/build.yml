@@ -174,14 +174,10 @@ jobs:
         run: |
           mkdir -p /opt/musl_gcc
           rustup set auto-self-update disable
-          rustup install 1.84
-          rustup default 1.84
+          rustup install 1.86
+          rustup default 1.86
           
-          #wget q -c https://github.com/lmq8267/Toolchain/releases/download/musl-cross/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
-          #tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
-          #sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
-          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include/ /usr/include/musl-cross
-          sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools libappindicator3-dev llvm clang
+          sudo apt-get update && sudo apt-get install -qq libappindicator3-dev llvm clang
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
             cp libgcc_eh.a libunwind.a
@@ -280,11 +276,11 @@ jobs:
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
           export KCP_SYS_EXTRA_HEADER_PATH=/usr/include/musl-cross
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
-             cargo +nightly build -r --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
+             cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
+             cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
           else
-             cargo build --release --target ${{ env.TARGET }} --package=easytier
-             cargo build --release --target ${{ env.TARGET }} --package=easytier-web --features=embed
+             cargo build --release -v --target ${{ env.TARGET }} --package=easytier
+             cargo build --release -v --target ${{ env.TARGET }} --package=easytier-web --features=embed
           fi
           
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
