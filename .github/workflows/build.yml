@@ -196,8 +196,23 @@ jobs:
             rustup target add ${{ env.TARGET }}
           fi
 
+      - name: 安装 UPX
+        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: v4.2.4
+          install-only: true
+      - name: 编译
+        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
+        run: |
+          tagg=${{ env.BRANCHES }}
+          [[ -z $tagg ]] && tagg=main
+          git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
+          cp -rf easytier-web/frontend/dist /opt/et/easytier-web/frontend/dist
+          cd /opt/et
+          rm -rf .cargo/config.toml
           #添加交叉编译配置
-          cat >>~/.cargo/config <<EOF
+          cat >>.cargo/config.toml <<EOF
           [target.x86_64-unknown-linux-musl]
           linker = "/opt/musl_gcc/x86_64-linux-musl-cross/bin/x86_64-linux-musl-gcc"
           rustflags = ["-C", "target-feature=+crt-static"]
@@ -248,21 +263,6 @@ jobs:
           "-l", "atomic",
           "-l", "ctz"]      
           EOF
-      - name: 安装 UPX
-        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
-        uses: crazy-max/ghaction-upx@v3
-        with:
-          version: v4.2.4
-          install-only: true
-      - name: 编译
-        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
-        run: |
-          tagg=${{ env.BRANCHES }}
-          [[ -z $tagg ]] && tagg=main
-          git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
-          cp -rf easytier-web/frontend/dist /opt/et/easytier-web/frontend/dist
-          cd /opt/et
-          rm -rf .cargo/config.toml
           #改成只使用中文帮助信息
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier/src/easytier-core.rs
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-core.rs
