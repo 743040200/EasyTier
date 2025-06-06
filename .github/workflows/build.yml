@@ -165,10 +165,10 @@ jobs:
           rustup install 1.84
           rustup default 1.84
           
-          wget -q -c https://github.com/lmq8267/Toolchain/releases/download/musl-cross/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
+          wget -c https://github.com/lmq8267/Toolchain/releases/download/musl-cross/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
           tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
-          sudo ln -s /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
-          sudo ln -s /opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include/ /usr/include/musl-cross
+          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
+          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include/ /usr/include/musl-cross
           sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools libappindicator3-dev llvm clang
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
