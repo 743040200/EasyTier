@@ -159,18 +159,23 @@ jobs:
           path: easytier-web/frontend/dist/
       - name: 下载编译工具
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
+        uses: lmq8267/dl-musl@main
+        with:
+          target: ${{ env.URL }}
+          gccpath: /opt/musl_gcc
+          
+      - name: 下载编译工具
+        if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         run: |
           mkdir -p /opt/musl_gcc
           rustup set auto-self-update disable
           rustup install 1.84
           rustup default 1.84
           
-          wget -c https://github.com/lmq8267/Toolchain/releases/download/musl-cross/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
-          tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
-          sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
+          #wget q -c https://github.com/lmq8267/Toolchain/releases/download/musl-cross/${{ env.URL }}-cross.tgz -P /opt/musl_gcc/
+          #tar zxf /opt/musl_gcc/${{ env.URL }}-cross.tgz -C /opt/musl_gcc/
+          #sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/bin/*gcc /usr/bin/
           sudo ln -sf /opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include/ /usr/include/musl-cross
-          ${{ env.URL }}-gcc -v || true
-          which ${{ env.URL }}-gcc
           sudo apt-get update && sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf musl-tools libappindicator3-dev llvm clang
           if [[ $TARGET =~ ^mips.*$ ]]; then
             cd /opt/musl_gcc/${{ env.URL }}-cross/lib/gcc/${{ env.URL }}/11.2.1 || exit 255
