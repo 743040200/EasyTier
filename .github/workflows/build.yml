@@ -277,11 +277,11 @@ jobs:
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
           export KCP_SYS_EXTRA_HEADER_PATH=/opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
-             cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
+             CFLAGS="" cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
+             CFLAGS="" cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
           else
-             cargo build --release -v --target ${{ env.TARGET }} --package=easytier
-             cargo build --release -v --target ${{ env.TARGET }} --package=easytier-web --features=embed
+             CFLAGS="" cargo build --release -v --target ${{ env.TARGET }} --package=easytier
+             CFLAGS="" cargo build --release -v --target ${{ env.TARGET }} --package=easytier-web --features=embed
           fi
           
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
