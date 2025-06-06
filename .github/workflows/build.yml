@@ -150,13 +150,18 @@ jobs:
       NAME: ${{ matrix.NAME }}
     steps:
       - uses: actions/checkout@v4
+      
       - name: 安装最新 Protoc
         uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: 下载静态页面
         uses: actions/download-artifact@v4
         with:
           name: easytier-web-dashboard
           path: easytier-web/frontend/dist/
+          
       - name: 下载编译工具
         if: ${{ matrix.TARGET != 'x86_64-unknown-freebsd' }}
         uses: lmq8267/dl-musl@main
