@@ -274,7 +274,7 @@ jobs:
 
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier-web/src/main.rs
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
-          export KCP_SYS_EXTRA_HEADER_PATH=/usr/include/musl-cross
+          export KCP_SYS_EXTRA_HEADER_PATH=/opt/musl_gcc/${{ env.URL }}-cross
           if [[ $TARGET =~ ^mips.*$ ]]; then
              cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
              cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
@@ -350,8 +350,8 @@ jobs:
               curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
               source $HOME/.cargo/env
               rustup set auto-self-update disable
-              rustup install 1.84
-              rustup default 1.84
+              rustup install 1.86
+              rustup default 1.86
               echo "编译版本：$tagg"
               git clone -b $tagg https://github.com/EasyTier/EasyTier /tmp/et
               ls
