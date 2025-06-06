@@ -262,6 +262,7 @@ jobs:
           git clone -b $tagg https://github.com/EasyTier/EasyTier /opt/et
           cp -rf easytier-web/frontend/dist /opt/et/easytier-web/frontend/dist
           cd /opt/et
+          rm -rf .cargo/config.toml
           #改成只使用中文帮助信息
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier/src/easytier-core.rs
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier/src/easytier-core.rs
