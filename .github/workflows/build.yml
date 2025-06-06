@@ -289,11 +289,11 @@ jobs:
             export BINDGEN_EXTRA_CLANG_ARGS=--sysroot=$(readlink -f /opt/musl_gcc/sysroot)
           fi
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --package=easytier-web --features=embed
-             cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --package=easytier ---no-default-features --features mips
+             cargo +nightly build -r --target $TARGET -Z build-std=std,panic_abort --package=easytier-web --features=embed
+             cargo +nightly build -r --target $TARGET -Z build-std=std,panic_abort --package=easytier ---no-default-features --features mips
           else
-            cargo build --release -v --target $TARGET --package=easytier-web --features=embed
-            cargo build --release -v --target $TARGET --package=easytier
+            cargo build --release --target $TARGET --package=easytier-web --features=embed
+            cargo build --release --target $TARGET --package=easytier
           fi
           if [[ $TARGET =~ ^mips.*$ || $TARGET =~ ^mipsel.*$ ]]; then
             MUSL_TARGET=${TARGET}sf
