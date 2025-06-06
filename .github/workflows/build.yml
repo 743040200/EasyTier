@@ -253,7 +253,8 @@ jobs:
           "-L", "/opt/musl_gcc/mipsel-linux-muslsf-cross/mipsel-linux-muslsf/lib",
           "-L", "/opt/musl_gcc/mipsel-linux-muslsf-cross/lib/gcc/mipsel-linux-muslsf/11.2.1",
           "-l", "atomic",
-          "-l", "ctz"]
+          "-l", "ctz",
+          "-l", "gcc"]
           
           [target.mips-unknown-linux-musl]
           linker = "/opt/musl_gcc/mips-linux-muslsf-cross/bin/mips-linux-muslsf-gcc"
@@ -261,7 +262,8 @@ jobs:
           "-L", "/opt/musl_gcc/mips-linux-muslsf-cross/mips-linux-muslsf/lib",
           "-L", "/opt/musl_gcc/mips-linux-muslsf-cross/lib/gcc/mips-linux-muslsf/11.2.1",
           "-l", "atomic",
-          "-l", "ctz"]      
+          "-l", "ctz",
+          "-l", "gcc"]      
           EOF
           #改成只使用中文帮助信息
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier/src/easytier-core.rs
@@ -276,12 +278,13 @@ jobs:
           sed -i 's/rust_i18n::i18n!("locales", fallback = "en");/rust_i18n::i18n!("locales", fallback = "zh-CN");/' ./easytier-web/src/main.rs
           sed -i 's/let locale = sys_locale::get_locale().unwrap_or_else(|| String::from("en-US"));/let locale = String::from("zh-CN");/' ./easytier-web/src/main.rs
           export KCP_SYS_EXTRA_HEADER_PATH=/opt/musl_gcc/${{ env.URL }}-cross/${{ env.URL }}/include
+          echo "构建 $TARGET"
           if [[ $TARGET =~ ^mips.*$ ]]; then
-             CFLAGS="" cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
-             CFLAGS="" cargo +nightly build -r -v --target ${{ env.TARGET }} -Z build-std=std,panic_abort --package=easytier-web --features=embed
+             cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --no-default-features --package=easytier --features mips
+             cargo +nightly build -r -v --target $TARGET -Z build-std=std,panic_abort --package=easytier-web --features=embed
           else
-             CFLAGS="" cargo build --release -v --target ${{ env.TARGET }} --package=easytier
-             CFLAGS="" cargo build --release -v --target ${{ env.TARGET }} --package=easytier-web --features=embed
+            cargo build --release -v --target $TARGET --package=easytier
+            cargo build --release -v --target $TARGET --package=easytier-web --features=embed
           fi
           
           /opt/musl_gcc/${{ env.URL }}-cross/bin/${{ env.URL }}-strip ./target/${{ env.TARGET }}/release/easytier-core
