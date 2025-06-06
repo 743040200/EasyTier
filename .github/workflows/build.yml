@@ -295,6 +295,7 @@ jobs:
             cargo build --release --target $TARGET --package=easytier-web --features=embed
             cargo build --release --target $TARGET --package=easytier
           fi
+          MUSL_TARGET=$TARGET
           if [[ $TARGET =~ ^mips.*$ || $TARGET =~ ^mipsel.*$ ]]; then
             MUSL_TARGET=${TARGET}sf
           fi
