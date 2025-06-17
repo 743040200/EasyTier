@@ -290,7 +290,7 @@ jobs:
           fi
           if [[ $TARGET =~ ^mips.*$ ]]; then
              cargo +nightly build -r --target $TARGET -Z build-std=std,panic_abort --package=easytier-web --features=embed
-             cargo +nightly build -r --target $TARGET -Z build-std=std,panic_abort --no-default-features --features mips --package=easytier
+             cargo +nightly build -r --target $TARGET -Z build-std=std,panic_abort --package=easytier
           else
             cargo build --release --target $TARGET --package=easytier-web --features=embed
             cargo build --release --target $TARGET --package=easytier
