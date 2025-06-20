@@ -69,7 +69,8 @@ jobs:
           sed -i 's|^// import { viteSingleFile }|import { viteSingleFile }|' easytier-web/frontend/vite.config.ts
           sed -i 's|vue(),/\* viteSingleFile() \*/|vue(), viteSingleFile()|' easytier-web/frontend/vite.config.ts
           sed -i 's|<script src="/api_meta.js"></script>|<script>window.apiMeta = { api_host: "https://config-server.easytier.cn" };</script>|' easytier-web/frontend/index.html
-          cat easytier-web/frontend/vite.config.ts
+          sed -i 's|\${location.origin}\${location.pathname}|https://config-server.easytier.cn|g' easytier-web/frontend/src/modules/api-host.ts
+
           pnpm -r install
           pnpm -r build
       - name: 上传到文件服务器
