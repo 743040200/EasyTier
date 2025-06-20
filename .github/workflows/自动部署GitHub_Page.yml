@@ -92,7 +92,7 @@ jobs:
           sed -i 's/>Device Count</>设备数量</g' easytier-web/frontend/src/components/DeviceList.vue
           
           sed -i 's/>Device List</>设备列表</g' easytier-web/frontend/src/components/DeviceList.vue
-          sed -i 's/>header="Hostname"/header="主机名"/g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/header="Hostname"/header="主机名"/g' easytier-web/frontend/src/components/DeviceList.vue
           sed -i 's/header="Public IP"/header="公网IP"/g' easytier-web/frontend/src/components/DeviceList.vue
           sed -i 's/header="Running Network Count"/header="运行中网络数量"/g' easytier-web/frontend/src/components/DeviceList.vue
           sed -i 's/header="Report Time"/header="上报时间"/g' easytier-web/frontend/src/components/DeviceList.vue
@@ -101,7 +101,7 @@ jobs:
           sed -i 's/`Manage/`管理/g' easytier-web/frontend/src/components/DeviceList.vue
 
           sed -i 's/Select Instance/选择实例/g' easytier-web/frontend/src/components/DeviceManagement.vue
-          sed -i 's/>Network</网络/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/>Network</>网络</g' easytier-web/frontend/src/components/DeviceManagement.vue
           sed -i 's/Edit File/编辑文件/g' easytier-web/frontend/src/components/DeviceManagement.vue
           sed -i 's/label="Import"/label="导入"/g' easytier-web/frontend/src/components/DeviceManagement.vue
           sed -i 's/Create New Network/创建新网络/g' easytier-web/frontend/src/components/DeviceManagement.vue
