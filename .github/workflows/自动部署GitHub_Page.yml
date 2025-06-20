@@ -68,6 +68,7 @@ jobs:
           cd /opt/et
           sed -i 's|^// import { viteSingleFile }|import { viteSingleFile }|' easytier-web/frontend/vite.config.ts
           sed -i 's|vue(),/\* viteSingleFile() \*/|vue(), viteSingleFile()|' easytier-web/frontend/vite.config.ts
+          sed -i 's|<script src="/api_meta.js"></script>|<script>window.apiMeta = { api_host: "https://config-server.easytier.cn" };</script>|' easytier-web/frontend/index.html
           cat easytier-web/frontend/vite.config.ts
           pnpm -r install
           pnpm -r build
@@ -82,6 +83,7 @@ jobs:
           sudo apt-get install -y sshpass
           cp -rf /opt/et/easytier-web/frontend/dist /opt/dist
           mv /opt/dist/index.html /opt/dist/web.html
+          rm -rf /opt/dist/api_meta.js || true
           sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r /opt/dist/* ${{ secrets.PAGECMD }}easytier/web/
       - name: 设置页面
         uses: actions/configure-pages@v5
