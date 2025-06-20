@@ -90,6 +90,7 @@ jobs:
           sed -i 's/>Login Page</>登录页面</g' easytier-web/frontend/src/components/Login.vue
 
           sed -i 's/>Device Count</>设备数量</g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/Load Summary Failed/>加载概览失败</g' easytier-web/frontend/src/components/Dashboard.vue
           
           sed -i 's/>Device List</>设备列表</g' easytier-web/frontend/src/components/DeviceList.vue
           sed -i 's/header="Hostname"/header="主机名"/g' easytier-web/frontend/src/components/DeviceList.vue
