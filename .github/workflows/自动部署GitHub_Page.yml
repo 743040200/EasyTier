@@ -83,11 +83,14 @@ jobs:
           sed -i 's/label="Register"/label="注册"/g' easytier-web/frontend/src/components/Login.vue
           sed -i 's/label="Back to Login"/label="返回登录"/g' easytier-web/frontend/src/components/Login.vue
 
-          sed -i 's/Change Password/修改密码/g' easytier-web/frontend/src/components/Login.vue
-          sed -i 's/Logout/退出/g' easytier-web/frontend/src/components/Login.vue
-          sed -i 's/>DashBoard</>仪表盘</g' easytier-web/frontend/src/components/Login.vue
-          sed -i 's/>Devices</>设备</g' easytier-web/frontend/src/components/Login.vue
-          sed -i 's/>Login Page</>登录页面</g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/Change Password/修改密码/g' easytier-web/frontend/src/components/MainPage.vue
+          sed -i 's/Logout/退出/g' easytier-web/frontend/src/components/MainPage.vue
+          sed -i 's/>DashBoard</>仪表盘</g' easytier-web/frontend/src/components/MainPage.vue
+          sed -i 's/>Settings</>设置</g' easytier-web/frontend/src/components/MainPage.vue
+          sed -i 's/>Earnings</>收益</g' easytier-web/frontend/src/components/MainPage.vue
+          sed -i 's/>Sign out</>退出登录</g' easytier-web/frontend/src/components/MainPage.vue
+          sed -i 's/>Devices</>设备</g' easytier-web/frontend/src/components/MainPage.vue
+          sed -i 's/>Login Page</>登录页面</g' easytier-web/frontend/src/components/MainPage.vue
 
           sed -i 's/>Device Count</>设备数量</g' easytier-web/frontend/src/components/DeviceList.vue
           sed -i 's/Load Summary Failed/>加载概览失败</g' easytier-web/frontend/src/components/Dashboard.vue
