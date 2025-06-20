@@ -86,6 +86,61 @@ jobs:
 
       - name: 打包静态页面
         run: |
+          sed -i "s/'Register' : 'Login'/'注册' : '登录'/g" easytier-web/frontend/src/components/Login.vue
+          sed -i 's/Login Failed/登录失败/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/Register Success/注册成功/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/Register Failed/注册失败/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/>Username</>用户名</g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/>Password</>密码</g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/>Captcha</>验证码</g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/alt="Captcha"/alt="验证码"/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/label="Login"/label="登录"/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/label="Register"/label="注册"/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/label="Back to Login"/label="返回登录"/g' easytier-web/frontend/src/components/Login.vue
+
+          sed -i 's/Change Password/修改密码/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/Logout/退出/g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/>DashBoard</>仪表盘</g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/>Devices</>设备</g' easytier-web/frontend/src/components/Login.vue
+          sed -i 's/>Login Page</>登录页面</g' easytier-web/frontend/src/components/Login.vue
+
+          sed -i 's/>Device Count</>设备数量</g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/Load Summary Failed/>加载概览失败</g' easytier-web/frontend/src/components/Dashboard.vue
+          
+          sed -i 's/>Device List</>设备列表</g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/header="Hostname"/header="主机名"/g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/header="Public IP"/header="公网IP"/g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/header="Running Network Count"/header="运行中网络数量"/g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/header="Report Time"/header="上报时间"/g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/header="EasyTier Version"/header="EasyTier版本"/g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/label="Reload"/label="刷新"/g' easytier-web/frontend/src/components/DeviceList.vue
+          sed -i 's/`Manage/`管理/g' easytier-web/frontend/src/components/DeviceList.vue
+
+          sed -i 's/Select Instance/选择实例/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/>Network</>网络</g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Edit File/编辑文件/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/label="Import"/label="导入"/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Create New Network/创建新网络/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i "s/'Edit Network'/'编辑网络'/g" easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/label="Delete"/label="删除"/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/label="Export"/label="导出"/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/label="Edit"/label="编辑"/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/label="Create"/label="新建"/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Select or create a network instance to manage/选择或创建一个网络实例进行管理/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i "s/'Import Success'/'导入成功'/g" easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Config file import success/配置文件导入成功/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i "s/'Error'/'错误'/g" easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Failed to create network, error: /创建网络失败，错误：/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/No network instance selected/未选择网络实例/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Failed to edit network, error:/编辑网络失败，错误：/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Failed to export network config, error:/无法导出网络配置，错误：/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Config file parse error:/配置文件解析错误：/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Parsed config is empty/解析的配置为空/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Do you want to delete this network?/确定要删除这个网络吗？/g' easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i "s/'Cancel'/'取消'/g" easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i "s/'Delete'/'删除'/g" easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i "s/Disable Network/禁用网络/g" easytier-web/frontend/src/components/DeviceManagement.vue
+          sed -i 's/Network is disabled, Loading config/网络已禁用，正在加载配置/g' easytier-web/frontend/src/components/DeviceManagement.vue
           pnpm -r install
           pnpm -r --filter "./easytier-web/*"  build
 
